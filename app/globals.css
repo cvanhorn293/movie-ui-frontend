@@ -3,13 +3,15 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
+  --font-roboto: "Roboto", sans-serif;
+  --font-roboto-flex: "Roboto Flex", monospace;
+  --font-headings: #BAC1CC;
+  --font-body: #242A38;
+  --hover-bg: #242A38;
+  --bg-dark: #111727;
+  --button-bg: #0065B3;
+  --off-white: #F3F3F3;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,5 +24,42 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-roboto);
 }
+
+.roboto {
+  font-family: var(--font-roboto);
+}
+
+.roboto-flex {
+  font-family: var(--font-roboto-flex);
+}
+
+.font-headings {
+  color: var(--font-headings);
+}
+
+.font-body {
+  color: var(--font-body);
+}
+
+.bg-hover {
+  background-color: var(--hover-bg);
+}
+
+.bg-dark {
+  background-color: var(--bg-dark);
+}
+
+.bg-button {
+  background-color: var(--button-bg);
+}
+
+.bg-off-white {
+  background-color: var(--off-white);
+}
+
+.color-off-white {
+  color: var(--off-white);
+}
+
