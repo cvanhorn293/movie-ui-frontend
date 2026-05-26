@@ -14,7 +14,7 @@ interface MovieListProps {
 
 export default function MovieList({ movies }: MovieListProps) {
     return (
-        <div>
+        <div className="text-dark">
             {movies.map((movie, index) => (
                 <div key={index}>
                     <h2>{movie.title}</h2>

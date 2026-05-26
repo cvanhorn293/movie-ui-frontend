@@ -43,6 +43,10 @@ body {
   color: var(--font-body);
 }
 
+.text-dark {
+  color: var(--bg-dark);
+}
+
 .bg-hover {
   background-color: var(--hover-bg);
 }
