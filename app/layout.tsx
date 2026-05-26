@@ -1,6 +1,6 @@
 import { Roboto, Roboto_Flex } from "next/font/google";
 import "./globals.css";
-import NavigationLayout from "./_components/NavigationLayout";
+import NavigationLayout from "./_components/navigationLayout";
 
 const roboto = Roboto({
     variable: "--font-roboto",
