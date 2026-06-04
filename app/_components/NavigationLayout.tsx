@@ -34,8 +34,8 @@ export default function NavigationLayout({ children }: { children: React.ReactNo
     return (
         <div className="flex min-h-screen bg-off-whitetransition-colors duration-200">
             {/* Desktop Sidebar */}
-            <aside className={`hidden md:flex flex-shrink-0 flex-col bg-dark-blue lightest-gray transition-all duration-300 ${sidebarCollapsed ? "w-16" : "w-64"}`}>
-                <nav className="flex-1 py-2 px-4">
+            <aside className={`hidden fixed top-0 left-0 bottom-0 md:flex flex-shrink-0 flex-col bg-dark-blue lightest-gray h-screen transition-all duration-300 ${sidebarCollapsed ? "w-16" : "w-64"}`}>
+                <nav className="flex-1 py-2 px-4 overflow-y-auto">
                     {/* Navigation Logo / Icon */}
                     <Image src={sidebarCollapsed ? MetroIcon : MetroLogo} alt="Metro Logo" loading="eager" className={`mx-auto mb-6 transition-opacity ${sidebarCollapsed ? "my-6 mb-12" : "my-3"}`} />
 
@@ -75,7 +75,7 @@ export default function NavigationLayout({ children }: { children: React.ReactNo
             </aside>
 
             {/* Main Content Area */}
-            <div className="flex-1 overflow-auto pb-20 md:pb-0">
+            <div className={`flex-1 overflow-auto pb-20 md:pb-0 transition-all duration-300 ${sidebarCollapsed ? "md:ml-16" : "md:ml-64"}`}>
                 <div className="justify-between bg-white sticky top-0 z-10 border-b border-bottom-gray h-16 flex items-center px-10 py-4">
                     <Search />
                     <Profile />

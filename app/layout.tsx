@@ -1,6 +1,7 @@
 import { Roboto, Roboto_Flex } from "next/font/google";
 import "./globals.css";
 import NavigationLayout from "./_components/navigationLayout";
+import Providers from "./_components/providers";
 
 const roboto = Roboto({
     variable: "--font-roboto",
@@ -20,7 +21,9 @@ export default function RootLayout({
     return (
         <html lang="en" className={`${roboto.variable} ${robotoFlex.variable} h-full antialiased`}>
             <body className="h-full bg-off-white">
-                <NavigationLayout>{children}</NavigationLayout>
+                <Providers>
+                    <NavigationLayout>{children}</NavigationLayout>
+                </Providers>
             </body>
         </html>
     );
