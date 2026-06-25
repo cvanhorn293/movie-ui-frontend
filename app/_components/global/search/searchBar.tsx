@@ -1,11 +1,14 @@
 "use client";
 import React, { useState } from "react";
-import SearchDropdown from "./searchDropdown";
 import SearchIcon from "@/app/_icons/Search.svg";
 
 type SearchType = "actors" | "directors" | "movies";
 
-export default function SearchBar() {
+interface SearchBarProps {
+    variant?: "default" | "hero";
+}
+
+export default function SearchBar({ variant = "default" }: SearchBarProps) {
     const [searchType, setSearchType] = useState<SearchType>("movies");
     const [searchQuery, setSearchQuery] = useState("");
 
@@ -19,14 +22,28 @@ export default function SearchBar() {
         }
     };
 
+    const isHero = variant === "hero";
+
     return (
-        <div className="relative w-full max-w-sm">
-            <div className="flex items-center bg-off-white border border-gray rounded-lg focus-within:ring-1 focus-within:ring-blue-500 focus-within:border-blue-500">
-                <SearchDropdown value={searchType} onChange={setSearchType} />
-                <input name="search" type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onKeyDown={handleKeyPress} placeholder={`Search ${searchType}...`} className="flex-1 px-4 py-2 focus:outline-none text-medium-blue text-sm" style={{ paddingLeft: "0.5rem" }} />
-                <button type="button" onClick={handleSearch} className="mr-1 px-2 py-2 bg-brand-blue hover:bg-hover transition-colors rounded-lg cursor-pointer" aria-label="Search">
+        <div className={`relative w-full ${isHero ? "max-w-2xl" : "max-w-xl"}`}>
+            <div
+                className={`flex items-center rounded-lg border focus-within:border-white/10 focus-within:ring-1 focus-within:ring-white/10 ${
+                    isHero ? "border-white/10 bg-black/30 shadow-lg backdrop-blur-md" : "border-white/5 bg-card shadow-inner"
+                }`}
+            >
+                <button type="button" onClick={handleSearch} className="mr-1 px-4 py-3 transition-colors rounded-lg cursor-pointer" aria-label="Search">
                     <SearchIcon className="w-4 h-4 text-off-white " />
                 </button>
+                <input
+                    name="search"
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={handleKeyPress}
+                    placeholder={`Search for movies, directors, or actors...`}
+                    className="flex-1 px-4 py-2 focus:outline-none text-medium-blue text-sm"
+                    style={{ paddingLeft: "0.5rem" }}
+                />
             </div>
         </div>
     );

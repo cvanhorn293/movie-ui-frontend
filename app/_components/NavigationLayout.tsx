@@ -3,8 +3,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useCallback, useMemo, useState, type FunctionComponent, type SVGProps } from "react";
-import { ActorsIcon, DashboardIcon, DirectorsIcon, FilmIcon, SettingsIcon, MetroLogo, MetroIcon, ChevLeft, ChevRight } from "./global/icons";
+import { useCallback, useEffect, useMemo, useRef, useState, type FunctionComponent, type SVGProps } from "react";
+import { Actors, DashboardIcon, DirectorsIcon, FilmIcon, SettingsIcon, MetroLogo, MetroIcon, ChevLeft, ChevRight, Favorites } from "./global/icons";
 import Profile from "./global/profile";
 import Search from "./global/search/searchBar";
 
@@ -17,9 +17,10 @@ type NavItem = {
 
 const navItems: NavItem[] = [
     { href: "/", label: "Dashboard", icon: DashboardIcon, desktop: true },
-    { href: "/actors", label: "Actors", icon: ActorsIcon, desktop: true },
+    { href: "/actors", label: "Actors", icon: Actors, desktop: true },
     { href: "/directors", label: "Directors", icon: DirectorsIcon, desktop: true },
     { href: "/movies", label: "Movies", icon: FilmIcon, desktop: true },
+    { href: "/favorites", label: "Favorites", icon: Favorites, desktop: true },
     { href: "/settings", label: "Settings", icon: SettingsIcon, desktop: false },
 ];
 
@@ -27,14 +28,27 @@ const getIsActive = (pathname: string, href: string): boolean => (href === "/" ?
 
 export default function NavigationLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
+    const isHome = pathname === "/";
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
+    const mainRef = useRef<HTMLDivElement>(null);
     const navWithState = useMemo(() => navItems.map((item) => ({ ...item, active: getIsActive(pathname, item.href) })), [pathname]);
     const toggleSidebar = useCallback(() => setSidebarCollapsed((prev) => !prev), []);
+
+    useEffect(() => {
+        const main = mainRef.current;
+        if (!main) return;
+
+        const handleScroll = () => setScrolled(main.scrollTop > 16);
+        handleScroll();
+        main.addEventListener("scroll", handleScroll, { passive: true });
+        return () => main.removeEventListener("scroll", handleScroll);
+    }, [pathname]);
 
     return (
         <div className="flex min-h-screen bg-off-whitetransition-colors duration-200">
             {/* Desktop Sidebar */}
-            <aside className={`hidden fixed top-0 left-0 bottom-0 md:flex flex-shrink-0 flex-col bg-dark-blue lightest-gray h-screen transition-all duration-300 ${sidebarCollapsed ? "w-16" : "w-64"}`}>
+            <aside className={`hidden fixed top-0 left-0 bottom-0 md:flex flex-shrink-0 flex-col bg-nav lightest-gray h-screen transition-all duration-300 ${sidebarCollapsed ? "w-16" : "w-64"}`}>
                 <nav className="flex-1 py-2 px-4 overflow-y-auto">
                     {/* Navigation Logo / Icon */}
                     <Image src={sidebarCollapsed ? MetroIcon : MetroLogo} alt="Metro Logo" loading="eager" className={`mx-auto mb-6 transition-opacity ${sidebarCollapsed ? "my-6 mb-12" : "my-3"}`} />
@@ -45,7 +59,15 @@ export default function NavigationLayout({ children }: { children: React.ReactNo
                         .map((item) => {
                             const IconComponent = item.icon;
                             return (
-                                <Link key={item.href} href={item.href} className={`flex items-center py-3 transition-colors roboto-flex ${sidebarCollapsed ? "justify-center" : "px-4 py-2 my-2 hover:bg-gray-700 rounded-lg"} ${item.active && !sidebarCollapsed ? "bg-hover rounded-lg" : ""}`}>
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className={`flex items-center py-3 transition-colors roboto-flex 
+                                        ${sidebarCollapsed ? "justify-center" : "px-4 py-2 my-2 rounded-lg"} 
+                                        ${!item.active && !sidebarCollapsed ? "hover:bg-hover/35" : ""} 
+                                        ${item.active && !sidebarCollapsed ? "bg-hover rounded-lg" : ""}
+                                    `}
+                                >
                                     <IconComponent className={` h-6 w-6 ${item.active && sidebarCollapsed ? "text-blue-300" : "lightest-gray"}  mb-1`} />
                                     {!sidebarCollapsed && <span className="ml-4 whitespace-nowrap font-medium">{item.label}</span>}
                                 </Link>
@@ -55,7 +77,7 @@ export default function NavigationLayout({ children }: { children: React.ReactNo
 
                 {/* Settings */}
                 <div className="py-2 px-4">
-                    <Link href="/settings" className={`flex items-center py-3 transition-colors hover:bg-hover roboto-flex ${sidebarCollapsed ? "justify-center" : "px-4 py-4"}`}>
+                    <Link href="/settings" className={`flex items-center py-3 transition-colors rounded-lg hover:bg-hover/35 roboto-flex ${sidebarCollapsed ? "justify-center" : "px-4 py-4"}`}>
                         <SettingsIcon className="h-6 w-6 lightest-gray mb-1" />
                         {!sidebarCollapsed && <span className="ml-4 whitespace-nowrap font-medium">Settings</span>}
                     </Link>
@@ -64,7 +86,7 @@ export default function NavigationLayout({ children }: { children: React.ReactNo
                     <button
                         type="button"
                         onClick={toggleSidebar}
-                        className={`flex cursor-pointer items-center py-3 transition-colors hover:bg-hover roboto-flex ${sidebarCollapsed ? "justify-center" : "px-4 py-4"}`}
+                        className={`flex cursor-pointer items-center py-3 transition-colors roboto-flex ${sidebarCollapsed ? "justify-center" : "px-4 py-4"}`}
                         title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
                         aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
                     >
@@ -74,13 +96,19 @@ export default function NavigationLayout({ children }: { children: React.ReactNo
                 </div>
             </aside>
 
+            {/* Fixed top bar (search + profile) overlays content on all pages */}
+            <header
+                className={`fixed top-0 right-0 left-0 z-30 flex items-center justify-between gap-4 px-4 py-4 transition-all duration-300 sm:px-6 ${sidebarCollapsed ? "md:left-16" : "md:left-64"} ${
+                    scrolled ? "border-b border-white/5 bg-card-nav-bg/80 backdrop-blur-md" : "border-b border-transparent bg-transparent"
+                }`}
+            >
+                <Search variant={isHome ? "hero" : "default"} />
+                <Profile />
+            </header>
+
             {/* Main Content Area */}
-            <div className={`flex-1 overflow-auto pb-20 md:pb-0 transition-all duration-300 ${sidebarCollapsed ? "md:ml-16" : "md:ml-64"}`}>
-                <div className="justify-between bg-white sticky top-0 z-10 border-b border-bottom-gray h-16 flex items-center px-10 py-4">
-                    <Search />
-                    <Profile />
-                </div>
-                <div className="container mx-auto px-4 py-4 sm:px-6 sm:py-8">{children}</div>
+            <div ref={mainRef} className={`flex-1 overflow-auto pb-20 md:pb-0 transition-all duration-300 ${sidebarCollapsed ? "md:ml-16" : "md:ml-64"}`}>
+                {isHome ? children : <div className="container mx-auto px-4 pt-24 pb-4 sm:px-6 sm:py-8 sm:pt-24">{children}</div>}
             </div>
 
             {/* Mobile Bottom Navigation */}

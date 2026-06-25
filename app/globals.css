@@ -1,118 +1,172 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Color Palette */
+  --color-hover: #0D2F3D;
+  --color-card-nav-bg: #04121D;
+  --color-primary-bg: #061621;
+  --color-button-transparent: rgba(6, 22, 33, 0.5);
   
-  /* Fonts */
-  --font-roboto: "Roboto", sans-serif;
-  --font-roboto-flex: "Roboto Flex", monospace;
+  /* Text Colors */
+  --color-text-primary: #F7F8F9;
+  --color-text-secondary: #BAC1CC;
+  --color-text-tertiary: #B3B3B3;
   
-  /* Colors */
-  --lightest-gray: #BAC1CC;
-  --font-body: #242A38;
-  --medium-blue: #242A38;
-  --dark-blue: #111727;
-  --brand-blue: #0065B3;
-  --off-white: #F3F3F3;
-  --light-gray: #B3B3B3;
-  --border-gray: #E2E5EA;
+  /* Font Families */
+  --font-family-roboto: "Roboto", sans-serif;
+  --font-family-roboto-flex: "Roboto Flex", monospace;
+}
 
+:root {
+  /* Gradients - CSS variables for complex values */
+  --primary-gradient: linear-gradient(90deg, #38FDCF 0%, #36FAF9 100%);
+  --border-gradient: var(--primary-gradient);
+  --button-bg-gradient: var(--primary-gradient);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    color-scheme: dark;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-roboto);
+  background-color: var(--color-primary-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-roboto);
 }
 
-/* Fonts */
-.roboto {
-  font-family: var(--font-roboto);
+/* Gradient Utilities */
+.bg-primary-gradient {
+  background: var(--primary-gradient);
 }
 
-.roboto-flex {
-  font-family: var(--font-roboto-flex);
+.bg-button-gradient {
+  background: var(--button-bg-gradient);
 }
 
-/* Colors */
-.light-gray {
-  color: var(--light-gray);
+.border-gradient {
+  border-image: var(--border-gradient) 1;
+  border-radius: 30px;
 }
 
-.lightest-gray {
-  color: var(--lightest-gray);
+/* Background Utilities */
+.bg-primary {
+  background-color: var(--color-primary-bg);
 }
 
-.font-body {
-  color: var(--font-body);
+.bg-nav, .bg-card {
+  background-color: var(--color-card-nav-bg);
 }
 
-.text-dark {
-  color: var(--dark-blue);
+.bg-button-transparent {
+  background-color: var(--color-button-transparent);
 }
 
-.color-off-white {
-  color: var(--off-white);
+/* Text Utilities */
+.text-primary {
+  color: var(--color-text-primary);
 }
 
-.text-medium-blue {
-  color: var(--medium-blue);
+.text-secondary {
+  color: var(--color-text-secondary);
 }
 
-.text-brand-blue {
-  color: var(--brand-blue);
+.text-tertiary {
+  color: var(--color-text-tertiary);
 }
 
-/* Backgrounds */
-.bg-hover {
-  background-color: var(--medium-blue);
+/* Gradient Text Utilities */
+.text-gradient {
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-fill-color: transparent;
+  background-size: 100% 100%;
+  background-position: 0 0;
+  background-repeat: repeat;
+  animation: gradient-animation 10s linear infinite;
 }
 
-.bg-dark-blue {
-  background-color: var(--dark-blue);
+/* Custom Scrollbar Styles */
+/* For Webkit browsers (Chrome, Safari, Edge) */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-.bg-button {
-  background-color: var(--brand-blue);
+*::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
 }
 
-.bg-off-white {
-  background-color: var(--off-white);
+*::-webkit-scrollbar-thumb {
+  background: rgba(186, 193, 204, 0.2);
+  border-radius: 10px;
+  transition: background 0.2s ease;
 }
 
-.bg-brand-blue {
-  background-color: var(--brand-blue);
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(186, 193, 204, 0.4);
 }
 
-/* Borders */
-.border-gray {
-  border-color: var(--border-gray);
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(186, 193, 204, 0.2) transparent;
 }
 
-.border-right-gray {
-  border-right-color: var(--border-gray);
+/* Button Utilities */
+.btn-gradient {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(56, 253, 207, 0.08);
+  border: 1.5px solid transparent;
+  background-image: linear-gradient(var(--color-primary-bg), var(--color-primary-bg)),
+    var(--primary-gradient);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
 }
 
-.border-bottom-gray {
-  border-bottom-color: var(--border-gray);
+.btn-gradient .btn-gradient-text {
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.border-top-gray {
-  border-top-color: var(--border-gray);
+.btn-gradient:hover {
+  background: var(--primary-gradient);
+  border-color: transparent;
+  box-shadow: 0 8px 24px rgba(56, 253, 207, 0.15);
 }
 
-.border-left-gray {
-  border-left-color: var(--border-gray);
+.btn-gradient:hover .btn-gradient-text {
+  background: var(--color-card-nav-bg);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.border-brand-blue {
-  border-color: var(--brand-blue);
+.btn-gradient:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary:active {
+  transform: translateY(0);
 }
