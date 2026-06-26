@@ -11,6 +11,11 @@ export interface User {
 
 export type FavoriteEntityType = "MOVIE" | "PERSON";
 
+export interface CreateFavoriteRequest {
+    entityType: FavoriteEntityType;
+    entityId: number;
+}
+
 export interface MovieSummary {
     tmdbId: number;
     title: string;

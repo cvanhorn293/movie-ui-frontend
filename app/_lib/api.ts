@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { DashboardData, User } from "./types";
+import type { CreateFavoriteRequest, DashboardData, Favorite, User } from "./types";
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
 
@@ -11,6 +11,20 @@ export const apiClient = axios.create({
 export async function fetchDashboard(): Promise<DashboardData> {
     const response = await apiClient.get<DashboardData>("/api/dashboard");
     return response.data;
+}
+
+export async function fetchFavorites(): Promise<Favorite[]> {
+    const response = await apiClient.get<Favorite[]>("/api/favorites");
+    return response.data;
+}
+
+export async function addFavorite(request: CreateFavoriteRequest): Promise<Favorite> {
+    const response = await apiClient.post<Favorite>("/api/favorites", request);
+    return response.data;
+}
+
+export async function removeFavorite(request: CreateFavoriteRequest): Promise<void> {
+    await apiClient.delete("/api/favorites", { data: request });
 }
 
 export async function fetchCurrentUser(): Promise<User | null> {

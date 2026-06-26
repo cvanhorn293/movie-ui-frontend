@@ -67,7 +67,7 @@ export function getMoviesForGenre(movies: MovieSummary[], genreName: string): Mo
     return movies
         .filter((movie) => movie.genreNames?.includes(genreName))
         .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
-        .slice(0, 3);
+        .slice(0, 6);
 }
 
 export function getFavoriteDecade(movies: MovieSummary[]): string | null {

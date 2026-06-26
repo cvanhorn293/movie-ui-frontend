@@ -57,12 +57,12 @@ export default function Profile() {
     const avatarInitial = getUserInitial(displayName);
 
     return (
-        <div className="relative" ref={dropdownRef}>
-            <button type="button" onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="flex items-center gap-2 rounded-lg transition-all hover:bg-white/5 p-1.5 -mr-1.5">
+        <div className="relative rounded-lg border focus-within:border-white/10 focus-within:ring-1 focus-within:ring-white/10 border-white/10 bg-black/30 shadow-lg backdrop-blur-md" ref={dropdownRef}>
+            <button type="button" onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="flex items-center gap-2 rounded-lg transition-all hover:bg-white/5 p-1.5 mr-1.5">
                 {user.avatarUrl ? (
-                    <img src={user.avatarUrl} alt={displayName} className="h-10 w-10 rounded-full object-cover ring-2 ring-transparent transition-all hover:ring-white/20" />
+                    <img src={user.avatarUrl} alt={displayName} className="h-8 w-8 rounded-full object-cover ring-2 ring-transparent transition-all hover:ring-white/20" />
                 ) : (
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500/20 to-teal-500/20 text-sm font-semibold text-primary ring-2 ring-transparent transition-all hover:ring-white/20">{avatarInitial}</div>
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500/20 to-teal-500/20 text-sm font-semibold text-primary ring-2 ring-transparent transition-all hover:ring-white/20">{avatarInitial}</div>
                 )}
                 <div className="hidden flex-col roboto-flex sm:flex text-left">
                     <span className="font-semibold text-primary text-sm">{displayName}</span>
