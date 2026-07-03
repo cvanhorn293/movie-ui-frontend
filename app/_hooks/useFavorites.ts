@@ -3,11 +3,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 import { addFavorite, fetchFavorites, removeFavorite } from "@/app/_lib/api";
-import type { DashboardData, Favorite, MovieSummary } from "@/app/_lib/types";
+import type { DashboardData, Favorite, FavoriteEntityType, MovieSummary, PersonSummary } from "@/app/_lib/types";
 import { useAuth } from "./useAuth";
 
 interface ToggleVariables {
-    movie: MovieSummary;
+    entityType: FavoriteEntityType;
+    entityId: number;
+    title: string;
+    imageUrl: string | null;
     isFavorited: boolean;
 }
 
@@ -16,79 +19,88 @@ interface MutationContext {
     previousDashboard?: DashboardData;
 }
 
-function makeOptimisticFavorite(movie: MovieSummary): Favorite {
+function makeOptimisticFavorite(entityType: FavoriteEntityType, entityId: number, title: string, imageUrl: string | null): Favorite {
     return {
         id: -Date.now(),
-        entityType: "MOVIE",
-        entityId: movie.tmdbId,
-        title: movie.title,
-        imageUrl: movie.posterUrl,
+        entityType,
+        entityId,
+        title,
+        imageUrl,
         createdAt: new Date().toISOString(),
     };
 }
 
-function isMovieFavorite(favorite: Favorite, tmdbId: number): boolean {
-    return favorite.entityType === "MOVIE" && favorite.entityId === tmdbId;
+function matches(favorite: Favorite, entityType: FavoriteEntityType, entityId: number): boolean {
+    return favorite.entityType === entityType && favorite.entityId === entityId;
 }
 
 export function useFavorites() {
     const queryClient = useQueryClient();
     const { isAuthenticated } = useAuth();
 
-    const { data: favorites = [] } = useQuery({
+    const { data } = useQuery({
         queryKey: ["favorites"],
         queryFn: fetchFavorites,
         enabled: isAuthenticated,
         staleTime: 60 * 1000,
     });
 
-    const favoriteMovieIds = useMemo(() => {
-        const ids = new Set<number>();
+    const favorites = Array.isArray(data) ? data : [];
+
+    const { favoriteMovieIds, favoritePersonIds } = useMemo(() => {
+        const movieIds = new Set<number>();
+        const personIds = new Set<number>();
         for (const favorite of favorites) {
             if (favorite.entityType === "MOVIE") {
-                ids.add(favorite.entityId);
+                movieIds.add(favorite.entityId);
+            } else if (favorite.entityType === "PERSON") {
+                personIds.add(favorite.entityId);
             }
         }
-        return ids;
+        return { favoriteMovieIds: movieIds, favoritePersonIds: personIds };
     }, [favorites]);
 
+    const favoritePeople = useMemo(() => favorites.filter((favorite) => favorite.entityType === "PERSON"), [favorites]);
+
     const mutation = useMutation<Favorite | null, unknown, ToggleVariables, MutationContext>({
-        mutationFn: async ({ movie, isFavorited }) => {
-            const request = { entityType: "MOVIE" as const, entityId: movie.tmdbId };
+        mutationFn: async ({ entityType, entityId, isFavorited }) => {
+            const request = { entityType, entityId };
             if (isFavorited) {
                 await removeFavorite(request);
                 return null;
             }
             return addFavorite(request);
         },
-        onMutate: async ({ movie, isFavorited }) => {
+        onMutate: async ({ entityType, entityId, title, imageUrl, isFavorited }) => {
             await queryClient.cancelQueries({ queryKey: ["favorites"] });
             await queryClient.cancelQueries({ queryKey: ["dashboard"] });
 
             const previousFavorites = queryClient.getQueryData<Favorite[]>(["favorites"]);
             const previousDashboard = queryClient.getQueryData<DashboardData>(["dashboard"]);
-            const optimistic = makeOptimisticFavorite(movie);
+            const optimistic = makeOptimisticFavorite(entityType, entityId, title, imageUrl);
 
             queryClient.setQueryData<Favorite[]>(["favorites"], (current = []) =>
-                isFavorited ? current.filter((favorite) => !isMovieFavorite(favorite, movie.tmdbId)) : [optimistic, ...current],
+                isFavorited ? current.filter((favorite) => !matches(favorite, entityType, entityId)) : [optimistic, ...current],
             );
 
             queryClient.setQueryData<DashboardData>(["dashboard"], (current) => {
                 if (!current) {
                     return current;
                 }
-                if (isFavorited) {
-                    return {
-                        ...current,
-                        favoriteCount: Math.max(0, current.favoriteCount - 1),
-                        recentFavorites: current.recentFavorites.filter((favorite) => !isMovieFavorite(favorite, movie.tmdbId)),
-                    };
-                }
-                return {
+                const delta = isFavorited ? -1 : 1;
+                const next: DashboardData = {
                     ...current,
-                    favoriteCount: current.favoriteCount + 1,
-                    recentFavorites: [optimistic, ...current.recentFavorites].slice(0, 10),
+                    favoriteCount: Math.max(0, current.favoriteCount + delta),
+                    recentFavorites: isFavorited
+                        ? current.recentFavorites.filter((favorite) => !matches(favorite, entityType, entityId))
+                        : [optimistic, ...current.recentFavorites].slice(0, 10),
                 };
+                if (entityType === "MOVIE") {
+                    next.movieCount = Math.max(0, current.movieCount + delta);
+                } else {
+                    next.personCount = Math.max(0, current.personCount + delta);
+                }
+                return next;
             });
 
             return { previousFavorites, previousDashboard };
@@ -112,18 +124,45 @@ export function useFavorites() {
             if (!isAuthenticated) {
                 return;
             }
-            mutation.mutate({ movie, isFavorited: favoriteMovieIds.has(movie.tmdbId) });
+            mutation.mutate({
+                entityType: "MOVIE",
+                entityId: movie.tmdbId,
+                title: movie.title,
+                imageUrl: movie.posterUrl,
+                isFavorited: favoriteMovieIds.has(movie.tmdbId),
+            });
         },
         [isAuthenticated, favoriteMovieIds, mutation],
     );
 
+    const togglePersonFavorite = useCallback(
+        (person: PersonSummary) => {
+            if (!isAuthenticated) {
+                return;
+            }
+            mutation.mutate({
+                entityType: "PERSON",
+                entityId: person.tmdbId,
+                title: person.name,
+                imageUrl: person.profileUrl,
+                isFavorited: favoritePersonIds.has(person.tmdbId),
+            });
+        },
+        [isAuthenticated, favoritePersonIds, mutation],
+    );
+
     const isFavorited = useCallback((tmdbId: number) => favoriteMovieIds.has(tmdbId), [favoriteMovieIds]);
+    const isPersonFavorited = useCallback((tmdbId: number) => favoritePersonIds.has(tmdbId), [favoritePersonIds]);
 
     return {
         favorites,
+        favoritePeople,
         favoriteMovieIds,
+        favoritePersonIds,
         isFavorited,
+        isPersonFavorited,
         toggleFavorite,
+        togglePersonFavorite,
         isAuthenticated,
         isToggling: mutation.isPending,
     };

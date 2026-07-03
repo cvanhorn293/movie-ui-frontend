@@ -60,3 +60,46 @@ export interface CollectionInsights {
     collectionAgeDays: number | null;
     recentFavorite: Favorite | null;
 }
+
+export interface PersonSummary {
+    tmdbId: number;
+    name: string;
+    knownForDepartment: string | null;
+    profileUrl: string | null;
+}
+
+export interface PersonCredit {
+    tmdbId: number;
+    title: string;
+    posterUrl: string | null;
+    releaseDate: string | null;
+    rating: number | null;
+    character: string | null;
+    job: string | null;
+}
+
+export interface PersonDetail {
+    tmdbId: number;
+    name: string;
+    biography: string | null;
+    knownForDepartment: string | null;
+    profileUrl: string | null;
+    birthday: string | null;
+    deathday?: string | null;
+    placeOfBirth?: string | null;
+    gender?: string | number | null;
+    alsoKnownAs?: string[];
+    homepage?: string | null;
+    knownFor?: PersonCredit[];
+}
+
+export interface PeoplePage {
+    page: number;
+    totalPages: number;
+    results: PersonSummary[];
+}
+
+export interface SearchResponse {
+    movies: MovieSummary[];
+    people: PersonSummary[];
+}

@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { CreateFavoriteRequest, DashboardData, Favorite, User } from "./types";
+import type { CreateFavoriteRequest, DashboardData, Favorite, PeoplePage, PersonDetail, SearchResponse, User } from "./types";
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
 
@@ -13,9 +13,24 @@ export async function fetchDashboard(): Promise<DashboardData> {
     return response.data;
 }
 
+export async function searchAll(query: string): Promise<SearchResponse> {
+    const response = await apiClient.get<SearchResponse>("/api/search", { params: { query } });
+    return response.data;
+}
+
+export async function fetchPerson(id: number): Promise<PersonDetail> {
+    const response = await apiClient.get<PersonDetail>(`/api/people/${id}`);
+    return response.data;
+}
+
+export async function fetchPeople(department: string, page = 1): Promise<PeoplePage> {
+    const response = await apiClient.get<PeoplePage>("/api/people", { params: { department, page } });
+    return response.data;
+}
+
 export async function fetchFavorites(): Promise<Favorite[]> {
     const response = await apiClient.get<Favorite[]>("/api/favorites");
-    return response.data;
+    return Array.isArray(response.data) ? response.data : [];
 }
 
 export async function addFavorite(request: CreateFavoriteRequest): Promise<Favorite> {

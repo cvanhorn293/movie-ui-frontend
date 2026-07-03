@@ -3,7 +3,8 @@
 import Link from "next/link";
 import type { MovieSummary } from "@/app/_lib/types";
 import { getSpotlightBackgroundUrl } from "@/app/_lib/tmdb-images";
-import { ChevRight, Favorites } from "@/app/_components/global/icons";
+import { ChevRight, Favorited, Favorites } from "@/app/_components/global/icons";
+import { useFavorites } from "@/app/_hooks/useFavorites";
 
 interface MovieSpotlightProps {
     movie: MovieSummary | null;
@@ -11,6 +12,8 @@ interface MovieSpotlightProps {
 }
 
 export default function MovieSpotlight({ movie, isLoading }: MovieSpotlightProps) {
+    const { isFavorited, toggleFavorite, isAuthenticated } = useFavorites();
+
     if (isLoading) {
         return (
             <section className="relative min-h-[75vh] w-full shrink-0 overflow-hidden">
@@ -28,6 +31,7 @@ export default function MovieSpotlight({ movie, isLoading }: MovieSpotlightProps
     }
 
     const backgroundUrl = getSpotlightBackgroundUrl(movie);
+    const favorited = isFavorited(movie.tmdbId);
 
     return (
         <section
@@ -68,10 +72,17 @@ export default function MovieSpotlight({ movie, isLoading }: MovieSpotlightProps
                         View Movie
                         <ChevRight className="h-4 w-4" />
                     </Link>
-                    <button type="button" className="btn-secondary inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-medium text-primary">
-                        <Favorites className="h-4 w-4" />
-                        Save to Favorites
-                    </button>
+                    {isAuthenticated && (
+                        <button
+                            type="button"
+                            onClick={() => toggleFavorite(movie)}
+                            aria-pressed={favorited}
+                            className="btn-secondary inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-medium text-primary"
+                        >
+                            {favorited ? <Favorited className="h-4 w-4 text-[#38FDCF]" /> : <Favorites className="h-4 w-4" />}
+                            {favorited ? "Saved to Favorites" : "Save to Favorites"}
+                        </button>
+                    )}
                 </div>
             </div>
         </section>

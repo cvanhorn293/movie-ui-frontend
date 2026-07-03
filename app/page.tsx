@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { fetchDashboard } from "./_lib/api";
 import { useAuth } from "./_hooks/useAuth";
@@ -32,6 +33,18 @@ export default function Home() {
                 {error && <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">Could not load dashboard data. Make sure the backend is running at {process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080"}.</div>}
 
                 {isAuthenticated && <MovieDnaSection data={data} isLoading={pageLoading} />}
+
+                {!authLoading && !isAuthenticated && (
+                    <div className="flex flex-col items-center gap-3 rounded-xl border border-white/5 bg-white/[0.02] px-6 py-8 text-center sm:flex-row sm:justify-between sm:text-left">
+                        <div>
+                            <h3 className="text-base font-semibold text-primary">Make it yours</h3>
+                            <p className="mt-1 text-sm text-secondary">Sign in to unlock your Movie DNA, personalized recommendations, and saved favorites.</p>
+                        </div>
+                        <Link href="/login" className="btn-gradient inline-flex shrink-0 items-center justify-center rounded-xl px-6 py-2.5 text-sm font-medium">
+                            <span className="btn-gradient-text">Sign in</span>
+                        </Link>
+                    </div>
+                )}
 
                 <MovieCarousel title="Trending Movies" movies={data?.trendingMovies ?? []} isLoading={pageLoading} />
 
