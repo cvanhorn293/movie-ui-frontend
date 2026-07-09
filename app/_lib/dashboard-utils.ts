@@ -31,6 +31,16 @@ export function getAllMovies(data: DashboardData): MovieSummary[] {
     return movies;
 }
 
+export function getDistinctRecommendedMovies(data: DashboardData): MovieSummary[] {
+    const seenElsewhere = new Set<number>();
+
+    for (const movie of [...data.trendingMovies, ...data.featuredMovies]) {
+        seenElsewhere.add(movie.tmdbId);
+    }
+
+    return data.recommendedMovies.filter((movie) => !seenElsewhere.has(movie.tmdbId));
+}
+
 export function buildGenreStats(movies: MovieSummary[]): GenreStat[] {
     const counts = new Map<string, number>();
 

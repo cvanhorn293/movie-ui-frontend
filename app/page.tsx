@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { fetchDashboard } from "./_lib/api";
 import { useAuth } from "./_hooks/useAuth";
-import { buildCollectionInsights, buildGenreStats, getAllMovies } from "./_lib/dashboard-utils";
+import { buildCollectionInsights, buildGenreStats, getAllMovies, getDistinctRecommendedMovies } from "./_lib/dashboard-utils";
 import CollectionInsights from "./_components/home/CollectionInsights";
 import MovieCarousel from "./_components/home/MovieCarousel";
 import MovieDnaSection from "./_components/home/MovieDnaSection";
@@ -21,6 +21,7 @@ export default function Home() {
 
     const genreStats = useMemo(() => buildGenreStats(data ? getAllMovies(data) : []), [data]);
     const insights = useMemo(() => (data ? buildCollectionInsights(data, genreStats) : null), [data, genreStats]);
+    const recommendedMovies = useMemo(() => (data ? getDistinctRecommendedMovies(data) : []), [data]);
 
     const spotlightMovie = data?.featuredMovies[0] ?? null;
     const pageLoading = isLoading || authLoading;
@@ -50,7 +51,7 @@ export default function Home() {
 
                 {isAuthenticated && insights && <CollectionInsights insights={insights} isLoading={pageLoading} />}
 
-                {isAuthenticated && <MovieCarousel title="Recommended Movies" movies={data?.recommendedMovies ?? []} isLoading={pageLoading} />}
+                {isAuthenticated && <MovieCarousel title="Recommended Movies" movies={recommendedMovies} isLoading={pageLoading} />}
             </div>
         </div>
     );

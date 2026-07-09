@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { CreateFavoriteRequest, DashboardData, Favorite, MovieDetail, MovieSummary, PeoplePage, PersonDetail, SearchResponse, User } from "./types";
+import type { CreateFavoriteRequest, DashboardData, Favorite, MovieBrowseResponse, MovieDetail, MovieSummary, PeoplePage, PersonDetail, RecommendationsResponse, SearchResponse, User } from "./types";
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
 
@@ -10,6 +10,23 @@ export const apiClient = axios.create({
 
 export async function fetchDashboard(): Promise<DashboardData> {
     const response = await apiClient.get<DashboardData>("/api/dashboard");
+    return response.data;
+}
+
+export async function fetchRecommendations(): Promise<RecommendationsResponse> {
+    try {
+        const response = await apiClient.get<RecommendationsResponse>("/api/recommendations");
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+            return { basedOnGenres: [], movies: [] };
+        }
+        throw error;
+    }
+}
+
+export async function fetchMovieBrowse(): Promise<MovieBrowseResponse> {
+    const response = await apiClient.get<MovieBrowseResponse>("/api/movies/browse");
     return response.data;
 }
 

@@ -129,3 +129,19 @@ export interface SearchResponse {
     movies: MovieSummary[];
     people: PersonSummary[];
 }
+
+export interface RecommendationsResponse {
+    basedOnGenres: string[];
+    movies: MovieSummary[];
+}
+
+export interface MovieBrowseGenreRow {
+    genreId: number;
+    genreName: string;
+    movies: MovieSummary[];
+}
+
+export interface MovieBrowseResponse {
+    trendingMovies: MovieSummary[];
+    genreRows: MovieBrowseGenreRow[];
+}

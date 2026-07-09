@@ -21,7 +21,8 @@ export default function MovieCarousel({ title, movies, isLoading, linkToDetail =
 
     return (
         <div className="flex flex-col gap-4">
-            {title && <h2 className="text-lg font-medium text-primary roboto-flex">{title}</h2>}
+            {title && <h2 className="text-xl font-bold text-[#F7F8F9] border-l-4 border-l-[#38FDCF] bg-white/5 py-2 pl-4 roboto-flex">{title}</h2>}
+            {/* {title && <h2 className="text-lg font-medium text-primary roboto-flex">{title}</h2>} */}
             {isLoading ? (
                 <div className="flex gap-4 overflow-hidden">
                     {Array.from({ length: 6 }).map((_, index) => (
@@ -38,11 +39,7 @@ export default function MovieCarousel({ title, movies, isLoading, linkToDetail =
 
                         const poster = (
                             <div className="relative aspect-[2/3] overflow-hidden rounded-lg bg-white/5 transition-transform group-hover:scale-[1.02]">
-                                {posterUrl ? (
-                                    <img src={posterUrl} alt={movie.title} className="h-full w-full object-cover" loading="lazy" />
-                                ) : (
-                                    <div className="flex h-full items-center justify-center px-2 text-center text-xs text-secondary">No poster</div>
-                                )}
+                                {posterUrl ? <img src={posterUrl} alt={movie.title} className="h-full w-full object-cover" loading="lazy" /> : <div className="flex h-full items-center justify-center px-2 text-center text-xs text-secondary">No poster</div>}
 
                                 {isAuthenticated && (
                                     <button
