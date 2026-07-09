@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, type FunctionComponent, type SVGProps } from "react";
-import { Actors, DashboardIcon, DirectorsIcon, FilmIcon, SettingsIcon, MetroLogo, MetroIcon, ChevLeft, ChevRight, Favorites } from "./global/icons";
+import { Actors, DashboardIcon, FilmIcon, SettingsIcon, MetroLogo, MetroIcon, ChevLeft, ChevRight, Favorites } from "./global/icons";
 import Profile from "./global/profile";
 import Search from "./global/search/searchBar";
 
@@ -17,8 +17,7 @@ type NavItem = {
 
 const navItems: NavItem[] = [
     { href: "/", label: "Dashboard", icon: DashboardIcon, desktop: true },
-    { href: "/actors", label: "Actors", icon: Actors, desktop: true },
-    { href: "/directors", label: "Directors", icon: DirectorsIcon, desktop: true },
+    { href: "/people", label: "People", icon: Actors, desktop: true },
     { href: "/movies", label: "Movies", icon: FilmIcon, desktop: true },
     { href: "/favorites", label: "Favorites", icon: Favorites, desktop: true },
     { href: "/settings", label: "Settings", icon: SettingsIcon, desktop: false },
@@ -29,6 +28,7 @@ const getIsActive = (pathname: string, href: string): boolean => (href === "/" ?
 export default function NavigationLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const isHome = pathname === "/";
+    const isFullBleed = isHome || pathname === "/movies" || /^\/movies\/\d+$/.test(pathname);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const mainRef = useRef<HTMLDivElement>(null);
@@ -108,7 +108,7 @@ export default function NavigationLayout({ children }: { children: React.ReactNo
 
             {/* Main Content Area */}
             <div ref={mainRef} className={`flex-1 overflow-auto pb-20 md:pb-0 transition-all duration-300 ${sidebarCollapsed ? "md:ml-16" : "md:ml-64"}`}>
-                {isHome ? children : <div className="container mx-auto px-4 pt-24 pb-4 sm:px-6 sm:py-8 sm:pt-24">{children}</div>}
+                {isFullBleed ? children : <div className="container mx-auto px-4 pt-24 pb-4 sm:px-6 sm:py-8 sm:pt-24">{children}</div>}
             </div>
 
             {/* Mobile Bottom Navigation */}

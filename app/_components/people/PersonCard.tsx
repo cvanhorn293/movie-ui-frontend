@@ -4,12 +4,14 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchPerson } from "@/app/_lib/api";
 import type { PersonSummary } from "@/app/_lib/types";
+import { getPersonRole, getPersonRoleLabel } from "@/app/_lib/personUtils";
 import { useFavorites } from "@/app/_hooks/useFavorites";
 import { Favorited, Favorites } from "@/app/_components/global/icons";
 
 interface PersonCardProps {
     person: PersonSummary;
     onSelect: (person: PersonSummary) => void;
+    showRoleBadge?: boolean;
 }
 
 function getInitials(name: string): string {
@@ -17,10 +19,11 @@ function getInitials(name: string): string {
     return ((parts[0]?.[0] ?? "") + (parts.length > 1 ? parts[parts.length - 1][0] : "")).toUpperCase() || "?";
 }
 
-export default function PersonCard({ person, onSelect }: PersonCardProps) {
+export default function PersonCard({ person, onSelect, showRoleBadge = false }: PersonCardProps) {
     const { isPersonFavorited, togglePersonFavorite, isAuthenticated } = useFavorites();
     const [hovered, setHovered] = useState(false);
     const favorited = isPersonFavorited(person.tmdbId);
+    const role = getPersonRole(person.knownForDepartment);
 
     // Fetch detail on hover — populates the hover facts and warms the cache the panel reuses.
     const { data: detail } = useQuery({
@@ -71,6 +74,16 @@ export default function PersonCard({ person, onSelect }: PersonCardProps) {
                     >
                         {favorited ? <Favorited className="h-4 w-4 text-[#38FDCF]" /> : <Favorites className="h-4 w-4 text-white" />}
                     </button>
+                )}
+
+                {showRoleBadge && role && (
+                    <span
+                        className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide backdrop-blur-sm ${
+                            role === "actor" ? "bg-cyan-500/20 text-cyan-200" : "bg-violet-500/20 text-violet-200"
+                        }`}
+                    >
+                        {getPersonRoleLabel(role)}
+                    </span>
                 )}
 
                 <div className="absolute inset-x-0 bottom-0 p-3">

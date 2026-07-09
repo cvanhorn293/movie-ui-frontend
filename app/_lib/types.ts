@@ -9,7 +9,7 @@ export interface User {
     createdAt: string;
 }
 
-export type FavoriteEntityType = "MOVIE" | "PERSON";
+export type FavoriteEntityType = "MOVIE" | "PERSON" | "ACTOR" | "DIRECTOR";
 
 export interface CreateFavoriteRequest {
     entityType: FavoriteEntityType;
@@ -26,6 +26,32 @@ export interface MovieSummary {
     releaseDate: string | null;
     genreIds: number[];
     genreNames: string[];
+}
+
+export interface MovieCastMember {
+    tmdbId: number;
+    name: string;
+    character: string | null;
+    profileUrl: string | null;
+}
+
+export interface MovieCrewMember {
+    tmdbId: number;
+    name: string;
+    job: string | null;
+    department: string | null;
+}
+
+export interface MovieDetail extends MovieSummary {
+    runtimeMinutes?: number | null;
+    tagline?: string | null;
+    status?: string | null;
+    originalLanguage?: string | null;
+    budget?: number | null;
+    revenue?: number | null;
+    productionCountries?: string[];
+    cast?: MovieCastMember[];
+    crew?: MovieCrewMember[];
 }
 
 export interface Favorite {

@@ -40,7 +40,7 @@ export default function SearchBar({ variant = "default" }: SearchBarProps) {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={handleKeyPress}
-                    placeholder={`Search for movies, directors, or actors...`}
+                    placeholder="Search for movies or people..."
                     className="flex-1 px-4 py-2 focus:outline-none text-medium-blue text-sm"
                     style={{ paddingLeft: "0.5rem" }}
                 />

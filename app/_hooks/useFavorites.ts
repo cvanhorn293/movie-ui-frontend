@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 import { addFavorite, fetchFavorites, removeFavorite } from "@/app/_lib/api";
+import { getFavoriteEntityTypeForPerson, isPersonFavoriteEntity } from "@/app/_lib/personUtils";
 import type { DashboardData, Favorite, FavoriteEntityType, MovieSummary, PersonSummary } from "@/app/_lib/types";
 import { useAuth } from "./useAuth";
 
@@ -34,6 +35,14 @@ function matches(favorite: Favorite, entityType: FavoriteEntityType, entityId: n
     return favorite.entityType === entityType && favorite.entityId === entityId;
 }
 
+function findPersonFavorite(favorites: Favorite[], tmdbId: number): Favorite | undefined {
+    return favorites.find((favorite) => isPersonFavoriteEntity(favorite.entityType) && favorite.entityId === tmdbId);
+}
+
+function isPersonEntityType(entityType: FavoriteEntityType): boolean {
+    return isPersonFavoriteEntity(entityType);
+}
+
 export function useFavorites() {
     const queryClient = useQueryClient();
     const { isAuthenticated } = useAuth();
@@ -53,14 +62,18 @@ export function useFavorites() {
         for (const favorite of favorites) {
             if (favorite.entityType === "MOVIE") {
                 movieIds.add(favorite.entityId);
-            } else if (favorite.entityType === "PERSON") {
+            } else if (isPersonFavoriteEntity(favorite.entityType)) {
                 personIds.add(favorite.entityId);
             }
         }
         return { favoriteMovieIds: movieIds, favoritePersonIds: personIds };
     }, [favorites]);
 
-    const favoritePeople = useMemo(() => favorites.filter((favorite) => favorite.entityType === "PERSON"), [favorites]);
+    const favoritePeople = useMemo(() => favorites.filter((favorite) => isPersonFavoriteEntity(favorite.entityType)), [favorites]);
+
+    const favoriteActors = useMemo(() => favorites.filter((favorite) => favorite.entityType === "ACTOR"), [favorites]);
+
+    const favoriteDirectors = useMemo(() => favorites.filter((favorite) => favorite.entityType === "DIRECTOR"), [favorites]);
 
     const mutation = useMutation<Favorite | null, unknown, ToggleVariables, MutationContext>({
         mutationFn: async ({ entityType, entityId, isFavorited }) => {
@@ -97,7 +110,7 @@ export function useFavorites() {
                 };
                 if (entityType === "MOVIE") {
                     next.movieCount = Math.max(0, current.movieCount + delta);
-                } else {
+                } else if (isPersonEntityType(entityType)) {
                     next.personCount = Math.max(0, current.personCount + delta);
                 }
                 return next;
@@ -140,15 +153,17 @@ export function useFavorites() {
             if (!isAuthenticated) {
                 return;
             }
+            const existing = findPersonFavorite(favorites, person.tmdbId);
+            const entityType = existing?.entityType ?? getFavoriteEntityTypeForPerson(person);
             mutation.mutate({
-                entityType: "PERSON",
+                entityType,
                 entityId: person.tmdbId,
                 title: person.name,
                 imageUrl: person.profileUrl,
                 isFavorited: favoritePersonIds.has(person.tmdbId),
             });
         },
-        [isAuthenticated, favoritePersonIds, mutation],
+        [isAuthenticated, favorites, favoritePersonIds, mutation],
     );
 
     const isFavorited = useCallback((tmdbId: number) => favoriteMovieIds.has(tmdbId), [favoriteMovieIds]);
@@ -157,6 +172,8 @@ export function useFavorites() {
     return {
         favorites,
         favoritePeople,
+        favoriteActors,
+        favoriteDirectors,
         favoriteMovieIds,
         favoritePersonIds,
         isFavorited,

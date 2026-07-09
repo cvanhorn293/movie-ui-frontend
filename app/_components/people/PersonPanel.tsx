@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchPerson } from "@/app/_lib/api";
 import type { PersonSummary } from "@/app/_lib/types";
+import { getPersonRole, getPersonRoleLabel } from "@/app/_lib/personUtils";
 import { useFavorites } from "@/app/_hooks/useFavorites";
 import { Favorited, Favorites } from "@/app/_components/global/icons";
 
@@ -98,6 +99,7 @@ export default function PersonPanel({ person, onClose }: PersonPanelProps) {
     const name = detail?.name ?? displayed?.name ?? "";
     const profileUrl = detail?.profileUrl ?? displayed?.profileUrl ?? null;
     const department = detail?.knownForDepartment ?? displayed?.knownForDepartment ?? null;
+    const role = getPersonRole(department);
     const favorited = personId != null && isPersonFavorited(personId);
     const knownFor = detail?.knownFor ?? [];
 
@@ -123,12 +125,7 @@ export default function PersonPanel({ person, onClose }: PersonPanelProps) {
                 aria-label={name ? `${name} details` : "Person details"}
                 className={`absolute right-0 top-0 flex h-full w-full max-w-md flex-col overflow-y-auto border-l border-white/10 bg-card-nav-bg shadow-2xl transition-transform duration-300 ease-out ${open ? "translate-x-0" : "translate-x-full"}`}
             >
-                <button
-                    type="button"
-                    onClick={onClose}
-                    aria-label="Close panel"
-                    className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-secondary backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-primary"
-                >
+                <button type="button" onClick={onClose} aria-label="Close panel" className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-secondary backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-primary">
                     <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -144,17 +141,17 @@ export default function PersonPanel({ person, onClose }: PersonPanelProps) {
                     </div>
 
                     <div className="flex min-w-0 flex-1 flex-col">
-                        <h2 className="text-2xl font-semibold leading-tight text-primary">{name}</h2>
+                        <div className="flex flex-wrap items-center gap-2">
+                            <h2 className="text-2xl font-semibold leading-tight text-primary">{name}</h2>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-secondary">
+                            {role && <span className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ${role === "actor" ? "bg-cyan-500/15 text-cyan-300" : "bg-violet-500/15 text-violet-300"}`}>{getPersonRoleLabel(role)}</span>}
+                        </div>
                         {department && <p className="mt-1 text-sm text-secondary">{department}</p>}
                         {age != null && <p className="mt-1 text-xs text-tertiary">{detail?.deathday ? `Aged ${age}` : `${age} years old`}</p>}
 
                         {isAuthenticated && displayed && (
-                            <button
-                                type="button"
-                                onClick={() => togglePersonFavorite(displayed)}
-                                aria-pressed={favorited}
-                                className="btn-secondary mt-auto inline-flex w-fit items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-primary"
-                            >
+                            <button type="button" onClick={() => togglePersonFavorite(displayed)} aria-pressed={favorited} className="btn-secondary mt-2 inline-flex w-fit items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-primary">
                                 {favorited ? <Favorited className="h-4 w-4 text-[#38FDCF]" /> : <Favorites className="h-4 w-4" />}
                                 {favorited ? "Favorited" : "Add to favorites"}
                             </button>
@@ -219,11 +216,7 @@ export default function PersonPanel({ person, onClose }: PersonPanelProps) {
                                 {knownFor.slice(0, 9).map((credit) => (
                                     <div key={`${credit.tmdbId}-${credit.character ?? credit.job ?? ""}`} className="flex flex-col">
                                         <div className="aspect-[2/3] overflow-hidden rounded-lg border border-white/5 bg-white/5">
-                                            {credit.posterUrl ? (
-                                                <img src={credit.posterUrl} alt={credit.title} loading="lazy" className="h-full w-full object-cover" />
-                                            ) : (
-                                                <div className="flex h-full items-center justify-center px-1 text-center text-[10px] text-tertiary">{credit.title}</div>
-                                            )}
+                                            {credit.posterUrl ? <img src={credit.posterUrl} alt={credit.title} loading="lazy" className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center px-1 text-center text-[10px] text-tertiary">{credit.title}</div>}
                                         </div>
                                         <p className="mt-1.5 line-clamp-2 text-xs font-medium text-primary">{credit.title}</p>
                                         {(credit.character || credit.job) && <p className="line-clamp-1 text-[11px] text-tertiary">{credit.character || credit.job}</p>}

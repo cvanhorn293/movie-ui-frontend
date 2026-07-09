@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { CreateFavoriteRequest, DashboardData, Favorite, PeoplePage, PersonDetail, SearchResponse, User } from "./types";
+import type { CreateFavoriteRequest, DashboardData, Favorite, MovieDetail, MovieSummary, PeoplePage, PersonDetail, SearchResponse, User } from "./types";
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
 
@@ -15,6 +15,11 @@ export async function fetchDashboard(): Promise<DashboardData> {
 
 export async function searchAll(query: string): Promise<SearchResponse> {
     const response = await apiClient.get<SearchResponse>("/api/search", { params: { query } });
+    return response.data;
+}
+
+export async function fetchMovie(id: number): Promise<MovieDetail> {
+    const response = await apiClient.get<MovieDetail>(`/api/movies/${id}`);
     return response.data;
 }
 

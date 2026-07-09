@@ -1,9 +1,23 @@
 import type { CollectionInsights as CollectionInsightsData } from "@/app/_lib/types";
+import type { FavoriteEntityType } from "@/app/_lib/types";
 import SectionCard from "./SectionCard";
 
 interface CollectionInsightsProps {
     insights: CollectionInsightsData;
     isLoading?: boolean;
+}
+
+function getFavoriteTypeLabel(entityType: FavoriteEntityType): string {
+    switch (entityType) {
+        case "MOVIE":
+            return "Movie";
+        case "ACTOR":
+            return "Actor";
+        case "DIRECTOR":
+            return "Director";
+        default:
+            return "Person";
+    }
 }
 
 interface InsightItemProps {
@@ -22,7 +36,7 @@ function InsightItem({ label, value }: InsightItemProps) {
 
 export default function CollectionInsights({ insights, isLoading }: CollectionInsightsProps) {
     const recentFavoriteLabel = insights.recentFavorite
-        ? `${insights.recentFavorite.title} (${insights.recentFavorite.entityType === "MOVIE" ? "Movie" : "Person"})`
+        ? `${insights.recentFavorite.title} (${getFavoriteTypeLabel(insights.recentFavorite.entityType)})`
         : "—";
 
     return (
