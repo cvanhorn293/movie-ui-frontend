@@ -84,6 +84,7 @@ export function useFavorites() {
             }
             return addFavorite(request);
         },
+        // Optimistic update: change the UI immediately, roll back on error.
         onMutate: async ({ entityType, entityId, title, imageUrl, isFavorited }) => {
             await queryClient.cancelQueries({ queryKey: ["favorites"] });
             await queryClient.cancelQueries({ queryKey: ["dashboard"] });

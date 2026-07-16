@@ -44,6 +44,7 @@ export function mergeUniqueMovies(...lists: MovieSummary[][]): MovieSummary[] {
     return movies;
 }
 
+/** Prefer the currently smallest genre row so exclusive rows stay balanced. */
 function pickExclusiveGenre(movie: MovieSummary, genreSizes: Map<string, number>, genrePopularity: Map<string, number>): string | null {
     const genres = movie.genreNames ?? [];
     if (genres.length === 0) {
@@ -141,6 +142,7 @@ export function excludeMovies(movies: MovieSummary[], excludeTmdbIds: ReadonlySe
     return movies.filter((movie) => !excludeTmdbIds.has(movie.tmdbId));
 }
 
+/** Rank by shared genres first, then rating, and return the top matches. */
 export function getSimilarMovies(movies: MovieSummary[], current: MovieSummary, limit = 8): MovieSummary[] {
     const genres = new Set(current.genreNames ?? []);
 

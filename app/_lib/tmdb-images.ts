@@ -4,6 +4,7 @@ export type TmdbImageSize = "w500" | "w780" | "w1280" | "original";
 
 const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p";
 
+/** Builds a sized TMDB URL, or swaps the size segment on an existing full URL. */
 export function buildTmdbImageUrl(pathOrUrl: string | null | undefined, size: TmdbImageSize = "w500"): string | null {
     if (!pathOrUrl) {
         return null;

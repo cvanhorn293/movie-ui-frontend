@@ -172,7 +172,7 @@ export default function GenreDonutChart({ genreStats, selectedGenre, onSelectGen
                         </button>
                         <div className="flex items-center gap-1.5">
                             {Array.from({ length: totalPages }).map((_, index) => (
-                                <button key={index} type="button" onClick={() => setPage(index)} aria-label={`Genre page ${index + 1}`} className={`h-1.5 rounded-full transition-all ${index === safePage ? "w-5 bg-[#38FDCF]" : "w-1.5 bg-white/20 hover:bg-white/40"}`} />
+                                <button key={index} type="button" onClick={() => setPage(index)} aria-label={`Genre page ${index + 1}`} className={`h-1.5 rounded-full transition-all ${index === safePage ? "w-5 bg-accent" : "w-1.5 bg-white/20 hover:bg-white/40"}`} />
                             ))}
                         </div>
                         <button

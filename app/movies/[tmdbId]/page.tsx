@@ -38,7 +38,7 @@ export default function MovieDetailPage() {
         return (
             <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 px-4 pt-24">
                 <p className="text-secondary">Invalid movie ID.</p>
-                <Link href="/movies" className="text-sm font-medium text-[#38FDCF] hover:opacity-80">
+                <Link href="/movies" className="text-sm font-medium text-accent hover:opacity-80">
                     Back to movies
                 </Link>
             </div>
@@ -53,7 +53,7 @@ export default function MovieDetailPage() {
         return (
             <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 px-4 pt-24">
                 <p className="text-secondary">Could not load this movie.</p>
-                <Link href="/movies" className="text-sm font-medium text-[#38FDCF] hover:opacity-80">
+                <Link href="/movies" className="text-sm font-medium text-accent hover:opacity-80">
                     Back to movies
                 </Link>
             </div>

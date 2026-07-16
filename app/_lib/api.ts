@@ -3,6 +3,7 @@ import type { CreateFavoriteRequest, DashboardData, Favorite, MovieBrowseRespons
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
 
+// Session cookies must travel with every request for OAuth-backed auth.
 export const apiClient = axios.create({
     baseURL: API_BASE_URL,
     withCredentials: true,
@@ -18,6 +19,7 @@ export async function fetchRecommendations(): Promise<RecommendationsResponse> {
         const response = await apiClient.get<RecommendationsResponse>("/api/recommendations");
         return response.data;
     } catch (error) {
+        // Unauthenticated users get an empty list instead of a hard failure.
         if (axios.isAxiosError(error) && error.response?.status === 401) {
             return { basedOnGenres: [], movies: [] };
         }
@@ -76,6 +78,7 @@ export async function fetchCurrentUser(): Promise<User | null> {
     }
 }
 
+/** Accepts camelCase or snake_case fields from the backend. */
 function normalizeUser(data: unknown): User | null {
     if (!data || typeof data !== "object") {
         return null;

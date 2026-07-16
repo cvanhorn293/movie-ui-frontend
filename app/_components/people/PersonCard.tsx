@@ -50,11 +50,11 @@ export default function PersonCard({ person, onSelect, showRoleBadge = false }: 
             }}
             onMouseEnter={() => setHovered(true)}
             onFocus={() => setHovered(true)}
-            className="group flex cursor-pointer flex-col rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-[#38FDCF]/60"
+            className="group -m-0.5 flex cursor-pointer flex-col rounded-xl border border-white/0 outline-none hover:border-accent/60 focus-visible:ring-2 focus-visible:ring-accent/60"
         >
             <div className="relative aspect-[2/3] overflow-hidden rounded-xl border border-white/5 bg-white/5">
                 {person.profileUrl ? (
-                    <img src={person.profileUrl} alt={person.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                    <img src={person.profileUrl} alt={person.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105" />
                 ) : (
                     <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-cyan-500/15 to-teal-500/10 text-3xl font-semibold text-primary/70">{getInitials(person.name)}</div>
                 )}
@@ -72,28 +72,20 @@ export default function PersonCard({ person, onSelect, showRoleBadge = false }: 
                         aria-pressed={favorited}
                         className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-black/45 backdrop-blur-sm transition-all hover:scale-110 hover:bg-black/65"
                     >
-                        {favorited ? <Favorited className="h-4 w-4 text-[#38FDCF]" /> : <Favorites className="h-4 w-4 text-white" />}
+                        {favorited ? <Favorited className="h-4 w-4 text-accent" /> : <Favorites className="h-4 w-4 text-white" />}
                     </button>
                 )}
 
-                {showRoleBadge && role && (
-                    <span
-                        className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide backdrop-blur-sm ${
-                            role === "actor" ? "bg-cyan-500/20 text-cyan-200" : "bg-violet-500/20 text-violet-200"
-                        }`}
-                    >
-                        {getPersonRoleLabel(role)}
-                    </span>
-                )}
+                {showRoleBadge && role && <span className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide backdrop-blur-sm bg-black/45 text-white`}>{getPersonRoleLabel(role)}</span>}
 
                 <div className="absolute inset-x-0 bottom-0 p-3">
-                    <h3 className="line-clamp-1 text-sm font-semibold text-primary">{person.name}</h3>
-                    {person.knownForDepartment && <p className="mt-0.5 line-clamp-1 text-xs text-secondary">{person.knownForDepartment}</p>}
+                    <h3 className="hero-safe-text line-clamp-1 text-sm font-semibold">{person.name}</h3>
+                    {person.knownForDepartment && <p className="hero-safe-muted mt-0.5 line-clamp-1 text-xs">{person.knownForDepartment}</p>}
 
                     <div className={`grid overflow-hidden transition-all duration-300 ${hovered && hasFacts ? "mt-1.5 grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
                         <div className="min-h-0 space-y-0.5">
-                            {bornYear && <p className="text-[11px] text-tertiary">Born {bornYear}</p>}
-                            {placeOfBirth && <p className="line-clamp-1 text-[11px] text-tertiary">{placeOfBirth}</p>}
+                            {bornYear && <p className="text-[11px] text-white/70">Born {bornYear}</p>}
+                            {placeOfBirth && <p className="line-clamp-1 text-[11px] text-white/70">{placeOfBirth}</p>}
                         </div>
                     </div>
                 </div>

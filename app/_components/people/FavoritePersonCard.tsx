@@ -31,7 +31,7 @@ export default function FavoritePersonCard({ person, onSelect }: FavoritePersonC
                     onSelect(person);
                 }
             }}
-            className="group flex cursor-pointer items-center gap-4 rounded-xl border border-[#38FDCF]/15 bg-gradient-to-r from-[#38FDCF]/[0.07] to-white/[0.02] p-3 outline-none transition-colors hover:border-[#38FDCF]/30 hover:from-[#38FDCF]/10 focus-visible:ring-2 focus-visible:ring-[#38FDCF]/60"
+            className="favorite-person-card group flex cursor-pointer items-center gap-4 rounded-xl border border-[#38FDCF]/15 bg-gradient-to-r from-[#38FDCF]/[0.07] to-white/[0.02] p-3 outline-none transition-colors hover:border-[#38FDCF]/30 hover:from-[#38FDCF]/10 focus-visible:ring-2 focus-visible:ring-[#38FDCF]/60"
         >
             <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full border border-white/10 bg-white/5">
                 {person.profileUrl ? (
@@ -44,7 +44,16 @@ export default function FavoritePersonCard({ person, onSelect }: FavoritePersonC
             <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                     <h3 className="line-clamp-1 text-sm font-semibold text-primary">{person.name}</h3>
-                    {role && <span className={`inline-flex shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${role === "actor" ? "bg-cyan-500/15 text-cyan-300" : "bg-violet-500/15 text-violet-300"}`}>{getPersonRoleLabel(role)}</span>}
+                    {role && (
+                        <span
+                            className={`favorite-person-role inline-flex shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
+                                role === "actor" ? "bg-cyan-500/15 text-cyan-300" : "bg-violet-500/15 text-violet-300"
+                            }`}
+                            data-role={role}
+                        >
+                            {getPersonRoleLabel(role)}
+                        </span>
+                    )}
                 </div>
             </div>
 
@@ -57,7 +66,7 @@ export default function FavoritePersonCard({ person, onSelect }: FavoritePersonC
                     }}
                     aria-label={favorited ? `Remove ${person.name} from favorites` : `Add ${person.name} to favorites`}
                     aria-pressed={favorited}
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-black/20 transition-all hover:scale-105 hover:border-[#38FDCF]/30 hover:bg-black/35"
+                    className="favorite-person-fav flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-black/20 transition-all hover:scale-105 hover:border-[#38FDCF]/30 hover:bg-black/35"
                 >
                     {favorited ? <Favorited className="h-4 w-4 text-[#38FDCF]" /> : <Favorites className="h-4 w-4 text-white/80" />}
                 </button>

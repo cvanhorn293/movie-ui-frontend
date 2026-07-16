@@ -21,6 +21,7 @@ export default function Home() {
 
     const genreStats = useMemo(() => buildGenreStats(data ? getAllMovies(data) : []), [data]);
     const insights = useMemo(() => (data ? buildCollectionInsights(data, genreStats) : null), [data, genreStats]);
+    // Hide recommendations that already appear in trending/featured.
     const recommendedMovies = useMemo(() => (data ? getDistinctRecommendedMovies(data) : []), [data]);
 
     const spotlightMovie = data?.featuredMovies[0] ?? null;
@@ -28,13 +29,16 @@ export default function Home() {
 
     return (
         <div className="flex w-full flex-col">
+            {/* Full-bleed featured movie hero */}
             <MovieSpotlight movie={spotlightMovie} isLoading={pageLoading} />
 
             <div className="container mx-auto flex flex-col gap-6 px-4 py-6 sm:px-6 sm:py-8">
                 {error && <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">Could not load dashboard data. Make sure the backend is running at {process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080"}.</div>}
 
+                {/* Personalized collection breakdown (signed-in only) */}
                 {isAuthenticated && <MovieDnaSection data={data} isLoading={pageLoading} />}
 
+                {/* Prompt guests to sign in for personal features */}
                 {!authLoading && !isAuthenticated && (
                     <div className="flex flex-col items-center gap-3 rounded-xl border border-white/5 bg-white/[0.02] px-6 py-8 text-center sm:flex-row sm:justify-between sm:text-left">
                         <div>

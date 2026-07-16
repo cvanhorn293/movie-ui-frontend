@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { fetchPerson } from "@/app/_lib/api";
 import type { PersonSummary } from "@/app/_lib/types";
@@ -58,6 +59,7 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 }
 
 export default function PersonPanel({ person, onClose }: PersonPanelProps) {
+    // Keep showing the last person while the close animation runs.
     const [displayed, setDisplayed] = useState<PersonSummary | null>(null);
     const [bioExpanded, setBioExpanded] = useState(false);
     const { isPersonFavorited, togglePersonFavorite, isAuthenticated } = useFavorites();
@@ -71,6 +73,7 @@ export default function PersonPanel({ person, onClose }: PersonPanelProps) {
         }
     }, [person]);
 
+    // Escape closes the panel; lock body scroll while open.
     useEffect(() => {
         const handleKey = (event: KeyboardEvent) => {
             if (event.key === "Escape") {
@@ -117,6 +120,7 @@ export default function PersonPanel({ person, onClose }: PersonPanelProps) {
 
     return (
         <div className={`fixed inset-0 z-50 ${open ? "" : "pointer-events-none"}`} aria-hidden={!open}>
+            {/* Dimmed backdrop */}
             <div className={`absolute inset-0 bg-black/60 transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0"}`} onClick={onClose} />
 
             <aside
@@ -131,6 +135,7 @@ export default function PersonPanel({ person, onClose }: PersonPanelProps) {
                     </svg>
                 </button>
 
+                {/* Profile header */}
                 <div className="flex gap-4 p-6 pb-4">
                     <div className="h-36 w-24 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-white/5">
                         {profileUrl ? (
@@ -145,24 +150,25 @@ export default function PersonPanel({ person, onClose }: PersonPanelProps) {
                             <h2 className="text-2xl font-semibold leading-tight text-primary">{name}</h2>
                         </div>
                         <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-secondary">
-                            {role && <span className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ${role === "actor" ? "bg-cyan-500/15 text-cyan-300" : "bg-violet-500/15 text-violet-300"}`}>{getPersonRoleLabel(role)}</span>}
+                            {role && <span className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ${role === "actor" ? "bg-cyan-500/15 text-accent" : "bg-violet-500/15 text-violet-600"}`}>{getPersonRoleLabel(role)}</span>}
                         </div>
                         {department && <p className="mt-1 text-sm text-secondary">{department}</p>}
                         {age != null && <p className="mt-1 text-xs text-tertiary">{detail?.deathday ? `Aged ${age}` : `${age} years old`}</p>}
 
                         {isAuthenticated && displayed && (
                             <button type="button" onClick={() => togglePersonFavorite(displayed)} aria-pressed={favorited} className="btn-secondary mt-2 inline-flex w-fit items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-primary">
-                                {favorited ? <Favorited className="h-4 w-4 text-[#38FDCF]" /> : <Favorites className="h-4 w-4" />}
-                                {favorited ? "Favorited" : "Add to favorites"}
-                            </button>
-                        )}
-                    </div>
+                            {favorited ? <Favorited className="h-4 w-4 text-accent" /> : <Favorites className="h-4 w-4" />}
+                            {favorited ? "Favorited" : "Add to favorites"}
+                        </button>
+                    )}
                 </div>
+            </div>
 
-                <div className="flex flex-col gap-6 px-6 pb-8">
-                    {(hasDetails || isLoading) && (
-                        <section>
-                            <h3 className="mb-1 text-xs font-medium uppercase tracking-wide text-tertiary">Details</h3>
+            <div className="flex flex-col gap-6 px-6 pb-8">
+                {/* Bio facts */}
+                {(hasDetails || isLoading) && (
+                    <section>
+                        <h3 className="mb-1 text-xs font-medium uppercase tracking-wide text-tertiary">Details</h3>
                             {isLoading ? (
                                 <div className="space-y-2 pt-2">
                                     {Array.from({ length: 3 }).map((_, index) => (
@@ -181,6 +187,7 @@ export default function PersonPanel({ person, onClose }: PersonPanelProps) {
                         </section>
                     )}
 
+                    {/* Expandable biography */}
                     <section>
                         <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-tertiary">Biography</h3>
                         {isLoading ? (
@@ -193,7 +200,7 @@ export default function PersonPanel({ person, onClose }: PersonPanelProps) {
                             <div>
                                 <p className="whitespace-pre-line text-sm leading-relaxed text-secondary">{shownBio}</p>
                                 {isBioLong && (
-                                    <button type="button" onClick={() => setBioExpanded((prev) => !prev)} className="mt-2 text-sm font-medium text-[#38FDCF] transition-opacity hover:opacity-80">
+                                    <button type="button" onClick={() => setBioExpanded((prev) => !prev)} className="mt-2 text-sm font-medium text-accent transition-opacity hover:opacity-80">
                                         {bioExpanded ? "Show less" : "Read more"}
                                     </button>
                                 )}
@@ -203,6 +210,7 @@ export default function PersonPanel({ person, onClose }: PersonPanelProps) {
                         )}
                     </section>
 
+                    {/* Notable credits */}
                     <section>
                         <h3 className="mb-3 text-xs font-medium uppercase tracking-wide text-tertiary">Known for</h3>
                         {isLoading ? (
@@ -214,13 +222,13 @@ export default function PersonPanel({ person, onClose }: PersonPanelProps) {
                         ) : knownFor.length > 0 ? (
                             <div className="grid grid-cols-3 gap-3">
                                 {knownFor.slice(0, 9).map((credit) => (
-                                    <div key={`${credit.tmdbId}-${credit.character ?? credit.job ?? ""}`} className="flex flex-col">
-                                        <div className="aspect-[2/3] overflow-hidden rounded-lg border border-white/5 bg-white/5">
-                                            {credit.posterUrl ? <img src={credit.posterUrl} alt={credit.title} loading="lazy" className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center px-1 text-center text-[10px] text-tertiary">{credit.title}</div>}
+                                    <Link key={`${credit.tmdbId}-${credit.character ?? credit.job ?? ""}`} href={`/movies/${credit.tmdbId}`} className="group flex flex-col">
+                                        <div className="aspect-[2/3] overflow-hidden rounded-lg border border-white/5 bg-white/5 transition-colors group-hover:border-accent/40">
+                                            {credit.posterUrl ? <img src={credit.posterUrl} alt={credit.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105" /> : <div className="flex h-full items-center justify-center px-1 text-center text-[10px] text-tertiary">{credit.title}</div>}
                                         </div>
-                                        <p className="mt-1.5 line-clamp-2 text-xs font-medium text-primary">{credit.title}</p>
+                                        <p className="mt-1.5 line-clamp-2 text-xs font-medium text-primary transition-colors group-hover:text-accent">{credit.title}</p>
                                         {(credit.character || credit.job) && <p className="line-clamp-1 text-[11px] text-tertiary">{credit.character || credit.job}</p>}
-                                    </div>
+                                    </Link>
                                 ))}
                             </div>
                         ) : (

@@ -13,6 +13,7 @@ function categorizeFavorite(favorite: Favorite, legacyRoleMap: Map<number, Perso
     if (favorite.entityType === "DIRECTOR") {
         return "director";
     }
+    // Legacy PERSON favorites need a fetched department to decide actor vs director.
     return legacyRoleMap.get(favorite.entityId) ?? null;
 }
 

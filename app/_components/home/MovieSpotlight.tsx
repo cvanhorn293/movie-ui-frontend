@@ -46,23 +46,25 @@ export default function MovieSpotlight({ movie, isLoading }: MovieSpotlightProps
                     : undefined
             }
         >
+            {/* Gradients keep the title readable over the backdrop */}
             <div className="absolute inset-0 bg-gradient-to-r from-[#04121D]/95 via-[#04121D]/50 to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#04121D]/90 via-transparent to-[#04121D]/40" />
 
+            {/* Title + CTAs sit in the lower-left of the hero — always light text on dark overlays */}
             <div className="relative z-10 flex min-h-[75vh] flex-col justify-end px-4 pt-24 pb-8 sm:px-6 sm:pb-10 md:max-w-[42%] lg:max-w-[38%]">
                 {movie.genreNames?.length > 0 && (
                     <div className="mb-3 flex flex-wrap gap-2">
                         {movie.genreNames.slice(0, 3).map((genre) => (
-                            <span key={genre} className="rounded-md bg-black/40 px-3 py-1 text-xs font-medium text-primary backdrop-blur-sm">
+                            <span key={genre} className="rounded-md bg-black/40 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
                                 {genre}
                             </span>
                         ))}
                     </div>
                 )}
 
-                <h2 className="text-4xl font-semibold text-primary sm:text-5xl">{movie.title}</h2>
+                <h2 className="hero-safe-text text-4xl font-semibold sm:text-5xl">{movie.title}</h2>
 
-                {movie.overview && <p className="mt-3 line-clamp-4 text-sm leading-relaxed text-secondary sm:text-base">{movie.overview}</p>}
+                {movie.overview && <p className="hero-safe-muted mt-3 line-clamp-4 text-sm leading-relaxed sm:text-base">{movie.overview}</p>}
 
                 <div className="mt-6 flex flex-wrap items-center gap-3">
                     <Link
@@ -77,9 +79,9 @@ export default function MovieSpotlight({ movie, isLoading }: MovieSpotlightProps
                             type="button"
                             onClick={() => toggleFavorite(movie)}
                             aria-pressed={favorited}
-                            className="btn-secondary inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-medium text-primary"
+                            className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-black/35 px-6 py-3 text-sm font-medium text-white backdrop-blur-sm transition-colors hover:bg-black/50"
                         >
-                            {favorited ? <Favorited className="h-4 w-4 text-[#38FDCF]" /> : <Favorites className="h-4 w-4" />}
+                            {favorited ? <Favorited className="h-4 w-4 text-accent" /> : <Favorites className="h-4 w-4" />}
                             {favorited ? "Saved to Favorites" : "Save to Favorites"}
                         </button>
                     )}

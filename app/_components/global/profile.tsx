@@ -57,30 +57,30 @@ export default function Profile() {
     const avatarInitial = getUserInitial(displayName);
 
     return (
-        <div className="relative rounded-lg border focus-within:border-white/10 focus-within:ring-1 focus-within:ring-white/10 border-white/10 bg-black/30 shadow-lg backdrop-blur-md" ref={dropdownRef}>
-            <button type="button" onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="flex items-center gap-2 rounded-lg transition-all hover:bg-white/5 p-1.5 mr-1.5">
+        <div className="relative rounded-lg border border-white/10 bg-card shadow-inner" ref={dropdownRef}>
+            <button type="button" onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="mr-1.5 flex items-center gap-2 rounded-lg p-1.5 transition-all hover:bg-white/5">
                 {user.avatarUrl ? (
                     <img src={user.avatarUrl} alt={displayName} className="h-8 w-8 rounded-full object-cover ring-2 ring-transparent transition-all hover:ring-white/20" />
                 ) : (
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500/20 to-teal-500/20 text-sm font-semibold text-primary ring-2 ring-transparent transition-all hover:ring-white/20">{avatarInitial}</div>
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-soft text-sm font-semibold text-accent ring-2 ring-transparent transition-all hover:ring-white/20">{avatarInitial}</div>
                 )}
-                <div className="hidden flex-col roboto-flex sm:flex text-left">
-                    <span className="font-semibold text-primary text-sm">{displayName}</span>
+                <div className="hidden flex-col text-left roboto-flex sm:flex">
+                    <span className="text-sm font-semibold text-primary">{displayName}</span>
                     <span className="text-xs text-secondary">Movie Lover</span>
                 </div>
-                <svg className="hidden sm:block h-4 w-4 text-secondary transition-transform" style={{ transform: isDropdownOpen ? "rotate(180deg)" : "rotate(0deg)" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="hidden h-4 w-4 text-secondary transition-transform sm:block" style={{ transform: isDropdownOpen ? "rotate(180deg)" : "rotate(0deg)" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
             </button>
 
             {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-56 rounded-xl bg-card-nav-bg border border-white/10 shadow-xl backdrop-blur-xl z-50 overflow-hidden">
-                    <div className="p-4 border-b border-white/10">
-                        <p className="text-sm font-medium text-primary truncate">{displayName}</p>
-                        <p className="text-xs text-secondary truncate mt-0.5">{user.email}</p>
+                <div className="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-xl border border-white/10 bg-card shadow-xl">
+                    <div className="border-b border-white/10 p-4">
+                        <p className="truncate text-sm font-medium text-primary">{displayName}</p>
+                        <p className="mt-0.5 truncate text-xs text-secondary">{user.email}</p>
                     </div>
                     <div className="p-2">
-                        <button type="button" onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-secondary hover:text-primary hover:bg-white/5 rounded-lg transition-colors">
+                        <button type="button" onClick={handleLogout} className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-secondary transition-colors hover:bg-white/5 hover:text-primary">
                             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                             </svg>

@@ -17,6 +17,7 @@ export function getGenreColor(index: number): string {
     return GENRE_COLORS[index % GENRE_COLORS.length];
 }
 
+/** Dedupes featured, trending, and recommended into one movie pool. */
 export function getAllMovies(data: DashboardData): MovieSummary[] {
     const seen = new Set<number>();
     const movies: MovieSummary[] = [];
@@ -31,6 +32,7 @@ export function getAllMovies(data: DashboardData): MovieSummary[] {
     return movies;
 }
 
+/** Recommendations that are not already shown in trending or featured. */
 export function getDistinctRecommendedMovies(data: DashboardData): MovieSummary[] {
     const seenElsewhere = new Set<number>();
 

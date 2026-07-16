@@ -32,7 +32,7 @@ export default function PaginationControls({ currentPage, totalPages, onPageChan
                         type="button"
                         onClick={() => onPageChange(page)}
                         className={`min-w-8 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors ${
-                            page === currentPage ? "bg-[#38FDCF]/15 text-[#38FDCF]" : "text-secondary hover:bg-white/5 hover:text-primary"
+                            page === currentPage ? "bg-accent-soft text-accent" : "text-secondary hover:bg-white/5 hover:text-primary"
                         }`}
                     >
                         {page}

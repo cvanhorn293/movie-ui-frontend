@@ -46,6 +46,7 @@ export function useMovieCatalog() {
         },
     });
 
+    // Older backends lack /api/movies/browse — fall back to dashboard + search.
     const useLegacyBrowse = browse.isError && axios.isAxiosError(browse.error) && browse.error.response?.status === 404;
 
     const dashboard = useQuery({

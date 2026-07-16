@@ -20,9 +20,9 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
 
 function DetailRow({ label, value }: { label: string; value: string }) {
     return (
-        <div className="flex flex-col gap-0.5 py-2 sm:flex-row sm:gap-4">
-            <span className="w-36 shrink-0 text-xs uppercase tracking-wide text-tertiary">{label}</span>
-            <span className="text-sm text-primary">{value}</span>
+        <div className="flex flex-col gap-0.5 py-4 sm:flex-row sm:gap-4">
+            <span className="w-36 shrink-0 text-xs uppercase text-tertiary">{label}</span>
+            <span className="text-sm font-medium text-primary">{value}</span>
         </div>
     );
 }
@@ -30,13 +30,11 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 function CastCard({ member }: { member: MovieCastMember }) {
     return (
         <div className="flex w-28 shrink-0 flex-col sm:w-32">
-            <div className="aspect-[2/3] overflow-hidden rounded-lg border border-white/10 bg-white/5">
+            <div data-scroll-poster className="aspect-[2/3] overflow-hidden rounded-lg border border-white/10 bg-white/5">
                 {member.profileUrl ? (
                     <img src={member.profileUrl} alt={member.name} className="h-full w-full object-cover" loading="lazy" />
                 ) : (
-                    <div className="flex h-full items-center justify-center bg-gradient-to-br from-cyan-500/15 to-teal-500/10 text-lg font-semibold text-primary/70">
-                        {getInitials(member.name)}
-                    </div>
+                    <div className="flex h-full items-center justify-center bg-gradient-to-br from-cyan-500/15 to-teal-500/10 text-lg font-semibold text-primary/70">{getInitials(member.name)}</div>
                 )}
             </div>
             <p className="mt-2 line-clamp-2 text-sm font-medium text-primary">{member.name}</p>
@@ -48,9 +46,7 @@ function CastCard({ member }: { member: MovieCastMember }) {
 function ActionButton({ label, children, onClick, href, pressed }: { label: string; children: React.ReactNode; onClick?: () => void; href?: string; pressed?: boolean }) {
     const content = (
         <>
-            <span className="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-black/30 backdrop-blur-sm transition-colors group-hover:border-white/40">
-                {children}
-            </span>
+            <span className="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-black/30 backdrop-blur-sm transition-colors group-hover:border-white/40">{children}</span>
             <span className="text-xs">{label}</span>
         </>
     );
@@ -78,35 +74,13 @@ function ScrollIndicator({ targetId }: { targetId: string }) {
     };
 
     return (
-        <button
-            type="button"
-            onClick={handleScroll}
-            aria-label="Scroll to more content"
-            className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-1 text-secondary transition-colors hover:text-primary"
-        >
+        <button type="button" onClick={handleScroll} aria-label="Scroll to more content" className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-1 text-secondary transition-colors hover:text-primary">
             <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/30 backdrop-blur-sm animate-bounce">
                 <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
             </span>
         </button>
-    );
-}
-
-function CrewList({ crew }: { crew: MovieCrewMember[] }) {
-    if (crew.length === 0) {
-        return null;
-    }
-
-    return (
-        <section className="flex flex-col gap-4">
-            <SectionHeading>Key crew</SectionHeading>
-            <div className="divide-y divide-white/5 rounded-xl border border-white/5 bg-white/[0.02] px-5">
-                {crew.map((member) => (
-                    <DetailRow key={`${member.tmdbId}-${member.job}`} label={member.job ?? "Crew"} value={member.name} />
-                ))}
-            </div>
-        </section>
     );
 }
 
@@ -117,6 +91,7 @@ export default function MovieDetailView({ movie, similarMovies }: MovieDetailVie
     const cast = movie.cast ?? [];
     const crew = movie.crew ?? [];
 
+    // Only show detail rows that have a value.
     const details = [
         { label: "Release date", value: formatReleaseDate(movie.releaseDate) },
         { label: "Runtime", value: formatRuntime(movie.runtimeMinutes) },
@@ -133,6 +108,7 @@ export default function MovieDetailView({ movie, similarMovies }: MovieDetailVie
 
     return (
         <div className="flex w-full flex-col">
+            {/* Full-bleed hero with backdrop and title */}
             <section
                 className="relative min-h-screen w-full overflow-hidden"
                 style={
@@ -145,9 +121,11 @@ export default function MovieDetailView({ movie, similarMovies }: MovieDetailVie
                         : undefined
                 }
             >
+                {/* Gradients keep title text readable over the backdrop */}
                 <div className="absolute inset-0 bg-gradient-to-r from-[#04121D]/95 via-[#04121D]/60 to-[#04121D]/30" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#04121D] via-[#04121D]/40 to-transparent" />
 
+                {/* Back + favorite actions */}
                 <div className="absolute top-28 right-8 left-8 z-20 flex items-start justify-between">
                     <ActionButton label="Browse" href="/movies">
                         <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -157,39 +135,41 @@ export default function MovieDetailView({ movie, similarMovies }: MovieDetailVie
 
                     {isAuthenticated && (
                         <ActionButton label={favorited ? "Favorited" : "Favorite"} onClick={() => toggleFavorite(movie)} pressed={favorited}>
-                            {favorited ? <Favorited className="h-5 w-5 text-[#38FDCF]" /> : <Favorites className="h-5 w-5" />}
+                            {favorited ? <Favorited className="h-5 w-5 text-accent" /> : <Favorites className="h-5 w-5" />}
                         </ActionButton>
                     )}
                 </div>
 
+                {/* Title block anchored to the bottom of the hero */}
                 <div className="relative z-10 flex min-h-screen flex-col justify-end px-4 pb-20 pt-28 sm:px-6 lg:px-10">
                     <div className="max-w-3xl">
                         {movie.genreNames?.length > 0 && (
                             <div className="mb-4 flex flex-wrap gap-2">
                                 {movie.genreNames.map((genre) => (
-                                    <span key={genre} className="rounded-md bg-black/40 px-3 py-1 text-xs font-medium text-primary backdrop-blur-sm">
+                                    <span key={genre} className="rounded-md bg-black/40 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
                                         {genre}
                                     </span>
                                 ))}
                             </div>
                         )}
 
-                        <h1 className="text-4xl font-semibold uppercase tracking-wide text-primary sm:text-5xl lg:text-6xl">{movie.title}</h1>
+                        <h1 className="hero-safe-text text-4xl font-semibold uppercase tracking-wide sm:text-5xl lg:text-6xl">{movie.title}</h1>
 
-                        {movie.tagline && <p className="mt-3 text-base italic text-secondary sm:text-lg">&ldquo;{movie.tagline}&rdquo;</p>}
+                        {movie.tagline && <p className="hero-safe-muted mt-3 text-base italic sm:text-lg">&ldquo;{movie.tagline}&rdquo;</p>}
 
-                        {movie.overview && <p className="mt-5 max-w-2xl text-sm leading-relaxed text-secondary sm:text-base">{movie.overview}</p>}
+                        {movie.overview && <p className="hero-safe-muted mt-5 max-w-2xl text-sm leading-relaxed sm:text-base">{movie.overview}</p>}
                     </div>
                 </div>
 
                 <ScrollIndicator targetId="movie-detail-content" />
             </section>
 
+            {/* Cast, facts, and similar titles below the fold */}
             <div id="movie-detail-content" className="container mx-auto flex flex-col gap-10 px-4 py-10 sm:px-6">
                 {cast.length > 0 && (
                     <section className="flex flex-col gap-4">
                         <SectionHeading>Cast</SectionHeading>
-                        <HorizontalScrollRow ariaLabel="Cast" controlsInsetBottom="3.25rem">
+                        <HorizontalScrollRow ariaLabel="Cast">
                             {cast.map((member) => (
                                 <CastCard key={`${member.tmdbId}-${member.character ?? member.name}`} member={member} />
                             ))}
@@ -200,15 +180,13 @@ export default function MovieDetailView({ movie, similarMovies }: MovieDetailVie
                 {details.length > 0 && (
                     <section className="flex flex-col gap-4">
                         <SectionHeading>Details</SectionHeading>
-                        <div className="divide-y divide-white/5 rounded-xl border border-white/5 bg-white/[0.02] px-5">
+                        <div className="divide-y divide-white/5">
                             {details.map((entry) => (
                                 <DetailRow key={entry.label} label={entry.label} value={entry.value} />
                             ))}
                         </div>
                     </section>
                 )}
-
-                <CrewList crew={crew} />
 
                 {similarMovies.length > 0 && <MovieCarousel title="Movies you might like" movies={similarMovies} />}
             </div>

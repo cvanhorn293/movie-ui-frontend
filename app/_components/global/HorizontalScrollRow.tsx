@@ -1,25 +1,35 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type ReactNode, type WheelEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { ChevLeft, ChevRight } from "@/app/_components/global/icons";
 
+/**
+ * Netflix-style row: full cards fit in the content width; peek cards sit in the side bleed.
+ * Pass itemsPerPage="auto" to size by viewport, a number to force a count, or omit to leave widths alone.
+ */
 interface HorizontalScrollRowProps {
     children: ReactNode;
     className?: string;
-    /** Space reserved below the poster area so arrows align with artwork, not titles. */
-    controlsInsetBottom?: string;
     ariaLabel?: string;
+    itemsPerPage?: number | "auto";
+    gap?: number;
 }
 
-function ScrollArrow({
-    direction,
-    onClick,
-    insetBottom,
-}: {
-    direction: "left" | "right";
-    onClick: () => void;
-    insetBottom: string;
-}) {
+function getAutoItemsPerPage(width: number): number {
+    if (width < 480) return 2;
+    if (width < 720) return 3;
+    if (width < 960) return 4;
+    if (width < 1200) return 5;
+    return 6;
+}
+
+/** Prefer the main scroll container so bleed lines up with page content gutters. */
+function findMainScroll(el: HTMLElement | null): HTMLElement | null {
+    if (!el) return null;
+    return el.closest<HTMLElement>("[data-main-scroll]") ?? (el.closest("main") as HTMLElement | null);
+}
+
+function ScrollArrow({ direction, onClick, height, width }: { direction: "left" | "right"; onClick: () => void; height: number | null; width: number }) {
     const isLeft = direction === "left";
 
     return (
@@ -27,105 +37,152 @@ function ScrollArrow({
             type="button"
             onClick={onClick}
             aria-label={isLeft ? "Show previous items" : "Show more items"}
-            className={`absolute top-0 z-20 flex w-10 items-center justify-center sm:w-14 ${
-                isLeft
-                    ? "left-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent pl-0.5 sm:pl-1"
-                    : "right-0 bg-gradient-to-l from-black/80 via-black/50 to-transparent pr-0.5 sm:pr-1"
-            }`}
-            style={{ bottom: insetBottom }}
+            className={`absolute top-0 z-20 flex items-center justify-center transition-opacity duration-200 ${isLeft ? "left-0 bg-black/45 hover:bg-black/60" : "right-0 bg-black/45 hover:bg-black/60"} opacity-100 md:opacity-0 md:group-hover/carousel:opacity-100`}
+            style={{ width: Math.max(width, 40), height: height ?? "72%" }}
         >
-            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/55 backdrop-blur-sm transition-transform hover:scale-110 hover:border-white/35 hover:bg-black/75">
-                {isLeft ? <ChevLeft className="h-4 w-4" /> : <ChevRight className="h-4 w-4" />}
-            </span>
+            {isLeft ? <ChevLeft className="h-7 w-7 text-white sm:h-8 sm:w-8" /> : <ChevRight className="h-7 w-7 text-white sm:h-8 sm:w-8" />}
         </button>
     );
 }
 
-export default function HorizontalScrollRow({
-    children,
-    className = "",
-    controlsInsetBottom = "3.5rem",
-    ariaLabel,
-}: HorizontalScrollRowProps) {
+export default function HorizontalScrollRow({ children, className = "", ariaLabel, itemsPerPage, gap = 16 }: HorizontalScrollRowProps) {
+    const railRef = useRef<HTMLDivElement>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
     const [canScrollLeft, setCanScrollLeft] = useState(false);
     const [canScrollRight, setCanScrollRight] = useState(false);
+    const [arrowHeight, setArrowHeight] = useState<number | null>(null);
+    const [leftBleed, setLeftBleed] = useState(0);
+    const [rightBleed, setRightBleed] = useState(0);
+    const [cardWidth, setCardWidth] = useState<number | null>(null);
+    const [pageSize, setPageSize] = useState(6);
 
-    const updateScrollState = useCallback(() => {
+    const sizeItems = itemsPerPage != null;
+
+    const updateMetrics = useCallback(() => {
+        const rail = railRef.current;
         const container = scrollRef.current;
-        if (!container) return;
+        if (!rail || !container) return;
 
-        const { scrollLeft, scrollWidth, clientWidth } = container;
-        setCanScrollLeft(scrollLeft > 4);
-        setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 4);
-    }, []);
+        const main = findMainScroll(rail);
+        const railRect = rail.getBoundingClientRect();
+        const mainRect = main?.getBoundingClientRect();
 
-    useEffect(() => {
-        const container = scrollRef.current;
-        if (!container) return;
+        const measuredLeft = mainRect ? Math.max(0, Math.round(railRect.left - mainRect.left)) : 0;
+        const measuredRight = mainRect ? Math.max(0, Math.round(mainRect.right - railRect.right)) : 0;
 
-        updateScrollState();
+        const controlledWidth = rail.clientWidth;
+        const nextPageSize = itemsPerPage === "auto" || itemsPerPage == null ? getAutoItemsPerPage(controlledWidth) : itemsPerPage;
 
-        const resizeObserver = new ResizeObserver(updateScrollState);
-        resizeObserver.observe(container);
-        container.addEventListener("scroll", updateScrollState, { passive: true });
-
-        return () => {
-            resizeObserver.disconnect();
-            container.removeEventListener("scroll", updateScrollState);
-        };
-    }, [updateScrollState, children]);
-
-    const getScrollStep = () => {
-        const container = scrollRef.current;
-        if (!container || container.children.length === 0) {
-            return container?.clientWidth ?? 0;
+        let nextCardWidth: number | null = null;
+        if (sizeItems && nextPageSize > 0) {
+            nextCardWidth = (controlledWidth - gap * (nextPageSize - 1)) / nextPageSize;
         }
 
-        const firstChild = container.children[0] as HTMLElement;
-        const style = getComputedStyle(container);
-        const gap = parseFloat(style.columnGap || style.gap) || 16;
-        const cardWidth = firstChild.getBoundingClientRect().width;
-        const visibleCount = Math.max(1, Math.floor((container.clientWidth + gap) / (cardWidth + gap)));
+        // Left bleed matches the real content gutter so the first card lines up with titles.
+        // Right bleed keeps a visible preview zone outside the controlled width.
+        const minPeek = nextCardWidth != null ? Math.round(nextCardWidth * 0.35) : 56;
+        const nextLeftBleed = measuredLeft;
+        const nextRightBleed = Math.max(measuredRight, minPeek);
 
-        return visibleCount * (cardWidth + gap);
-    };
+        setPageSize(nextPageSize);
+        setCardWidth(nextCardWidth);
+        setLeftBleed(nextLeftBleed);
+        setRightBleed(nextRightBleed);
 
-    const scroll = (direction: "left" | "right") => {
+        const { scrollLeft, scrollWidth, clientWidth } = container;
+        const maxScroll = scrollWidth - clientWidth;
+        setCanScrollLeft(scrollLeft > 2);
+        setCanScrollRight(maxScroll > 2 && scrollLeft < maxScroll - 2);
+
+        const poster = container.querySelector<HTMLElement>("[data-scroll-poster]");
+        const nextHeight = poster?.offsetHeight ?? null;
+        setArrowHeight((current) => (current === nextHeight ? current : nextHeight));
+    }, [gap, itemsPerPage, sizeItems]);
+
+    useEffect(() => {
+        const rail = railRef.current;
         const container = scrollRef.current;
-        if (!container) return;
+        if (!rail || !container) return;
 
-        const step = getScrollStep();
-        const maxScroll = container.scrollWidth - container.clientWidth;
-        const next =
-            direction === "right"
-                ? Math.min(container.scrollLeft + step, maxScroll)
-                : Math.max(container.scrollLeft - step, 0);
+        updateMetrics();
+        const frame = requestAnimationFrame(updateMetrics);
 
+        const resizeObserver = new ResizeObserver(updateMetrics);
+        resizeObserver.observe(rail);
+        resizeObserver.observe(container);
+
+        const main = findMainScroll(rail);
+        if (main) {
+            resizeObserver.observe(main);
+        }
+
+        for (const child of container.children) {
+            if (child instanceof HTMLElement) {
+                resizeObserver.observe(child);
+            }
+        }
+
+        container.addEventListener("scroll", updateMetrics, { passive: true });
+        window.addEventListener("resize", updateMetrics);
+
+        const images = container.querySelectorAll("img");
+        images.forEach((image) => {
+            if (!image.complete) {
+                image.addEventListener("load", updateMetrics, { once: true });
+            }
+        });
+
+        return () => {
+            cancelAnimationFrame(frame);
+            resizeObserver.disconnect();
+            container.removeEventListener("scroll", updateMetrics);
+            window.removeEventListener("resize", updateMetrics);
+        };
+    }, [updateMetrics, children]);
+
+    const scrollByPage = (direction: "left" | "right") => {
+        const container = scrollRef.current;
+        if (!container || container.children.length === 0) return;
+
+        const firstChild = container.children[0] as HTMLElement;
+        const resolvedCardWidth = cardWidth ?? firstChild.getBoundingClientRect().width;
+        const amount = pageSize * (resolvedCardWidth + gap);
+        const maxScroll = Math.max(0, container.scrollWidth - container.clientWidth);
+        const current = container.scrollLeft;
+
+        // Snap to the real ends so the last page lands on the controlled content edge.
+        if (direction === "right") {
+            const remaining = maxScroll - current;
+            const next = remaining <= amount + 2 ? maxScroll : current + amount;
+            container.scrollTo({ left: next, behavior: "smooth" });
+            return;
+        }
+
+        const next = current <= amount + 2 ? 0 : current - amount;
         container.scrollTo({ left: next, behavior: "smooth" });
     };
 
-    const handleWheel = (event: WheelEvent<HTMLDivElement>) => {
-        const container = scrollRef.current;
-        if (!container || container.scrollWidth <= container.clientWidth) return;
-
-        event.preventDefault();
-        container.scrollLeft += event.deltaY;
+    const trackStyle: CSSProperties = {
+        width: `calc(100% + ${leftBleed + rightBleed}px)`,
+        marginLeft: -leftBleed,
+        marginRight: -rightBleed,
+        ...(cardWidth != null
+            ? ({
+                  ["--carousel-card-width" as string]: `${cardWidth}px`,
+                  ["--carousel-gap" as string]: `${gap}px`,
+              } as CSSProperties)
+            : null),
     };
 
     return (
-        <div className="relative">
-            {canScrollLeft && <ScrollArrow direction="left" onClick={() => scroll("left")} insetBottom={controlsInsetBottom} />}
-            {canScrollRight && <ScrollArrow direction="right" onClick={() => scroll("right")} insetBottom={controlsInsetBottom} />}
+        <div ref={railRef} className="relative w-full">
+            <div className="group/carousel relative" style={trackStyle}>
+                {canScrollLeft && <ScrollArrow direction="left" onClick={() => scrollByPage("left")} height={arrowHeight} width={leftBleed} />}
+                {canScrollRight && <ScrollArrow direction="right" onClick={() => scrollByPage("right")} height={arrowHeight} width={rightBleed} />}
 
-            <div
-                ref={scrollRef}
-                onWheel={handleWheel}
-                className={`no-scrollbar flex gap-4 overflow-x-auto scroll-smooth pb-2 ${className}`}
-                role={ariaLabel ? "region" : undefined}
-                aria-label={ariaLabel}
-            >
-                {children}
+                <div ref={scrollRef} className={`no-scrollbar flex overflow-x-auto scroll-smooth pb-2 ${className}`} style={{ gap, paddingLeft: leftBleed, paddingRight: rightBleed }} role={ariaLabel ? "region" : undefined} aria-label={ariaLabel}>
+                    {children}
+                </div>
             </div>
         </div>
     );

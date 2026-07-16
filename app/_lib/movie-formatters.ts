@@ -29,6 +29,7 @@ export function formatReleaseDate(value: string | null | undefined): string | nu
         return null;
     }
     const date = new Date(value);
+    // Invalid dates still show a year when the string starts with YYYY.
     if (Number.isNaN(date.getTime())) {
         return value.slice(0, 4);
     }
