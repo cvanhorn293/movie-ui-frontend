@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { MovieCastMember, MovieCrewMember, MovieDetail, MovieSummary } from "@/app/_lib/types";
+import type { MovieCastMember, MovieDetail, MovieSummary } from "@/app/_lib/types";
 import { formatCurrency, formatLanguage, formatReleaseDate, formatRuntime, getInitials } from "@/app/_lib/movie-formatters";
 import { getSpotlightBackgroundUrl } from "@/app/_lib/tmdb-images";
 import { Favorited, Favorites } from "@/app/_components/global/icons";
@@ -89,7 +89,6 @@ export default function MovieDetailView({ movie, similarMovies }: MovieDetailVie
     const backgroundUrl = getSpotlightBackgroundUrl(movie);
     const favorited = isFavorited(movie.tmdbId);
     const cast = movie.cast ?? [];
-    const crew = movie.crew ?? [];
 
     // Only show detail rows that have a value.
     const details = [

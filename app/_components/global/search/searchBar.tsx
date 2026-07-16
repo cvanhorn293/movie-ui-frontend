@@ -21,17 +21,19 @@ function SearchBarInner({ variant = "default" }: SearchBarProps) {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const containerRef = useRef<HTMLDivElement>(null);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [debouncedQuery, setDebouncedQuery] = useState("");
-    const [isOpen, setIsOpen] = useState(false);
 
     const urlQuery = pathname === "/search" ? (searchParams.get("q") ?? "") : "";
+    const [searchQuery, setSearchQuery] = useState(urlQuery);
+    const [debouncedQuery, setDebouncedQuery] = useState(urlQuery);
+    const [syncedUrlQuery, setSyncedUrlQuery] = useState(urlQuery);
+    const [isOpen, setIsOpen] = useState(false);
 
     // Keep the input in sync when landing on /search?q=…
-    useEffect(() => {
+    if (urlQuery !== syncedUrlQuery) {
+        setSyncedUrlQuery(urlQuery);
         setSearchQuery(urlQuery);
         setDebouncedQuery(urlQuery);
-    }, [urlQuery]);
+    }
 
     // Debounce preview requests.
     useEffect(() => {

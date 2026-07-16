@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore, type ReactNode } from "react";
 
 export type ThemeMode = "dark" | "light";
 
@@ -21,23 +21,14 @@ interface SettingsContextValue {
 const SettingsContext = createContext<SettingsContextValue | null>(null);
 
 function readTheme(): ThemeMode {
-    if (typeof window === "undefined") {
-        return "dark";
-    }
-
     try {
-        const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
-        return stored === "light" ? "light" : "dark";
+        return window.localStorage.getItem(THEME_STORAGE_KEY) === "light" ? "light" : "dark";
     } catch {
         return "dark";
     }
 }
 
 function readBool(key: string, fallback: boolean): boolean {
-    if (typeof window === "undefined") {
-        return fallback;
-    }
-
     try {
         const stored = window.localStorage.getItem(key);
         if (stored == null) {
@@ -49,40 +40,54 @@ function readBool(key: string, fallback: boolean): boolean {
     }
 }
 
-function writeBool(key: string, value: boolean) {
-    try {
-        window.localStorage.setItem(key, String(value));
-    } catch {
-        // Ignore storage failures.
-    }
-}
-
 function applyTheme(theme: ThemeMode) {
     document.documentElement.setAttribute("data-theme", theme);
     document.documentElement.style.colorScheme = theme;
 }
 
+type Listener = () => void;
+const listeners = new Set<Listener>();
+
+function subscribe(listener: Listener) {
+    listeners.add(listener);
+    return () => {
+        listeners.delete(listener);
+    };
+}
+
+function emitChange() {
+    listeners.forEach((listener) => listener());
+}
+
+function getThemeSnapshot(): ThemeMode {
+    return readTheme();
+}
+
+function getShowRatingsSnapshot(): boolean {
+    return readBool(SHOW_RATINGS_STORAGE_KEY, true);
+}
+
+function getOgSnapshot(): boolean {
+    return readBool(OG_STORAGE_KEY, false);
+}
+
 export function SettingsProvider({ children }: { children: ReactNode }) {
-    const [theme, setThemeState] = useState<ThemeMode>("dark");
-    const [showRatings, setShowRatingsState] = useState(true);
-    const [ogMode, setOgModeState] = useState(false);
+    const theme = useSyncExternalStore(subscribe, getThemeSnapshot, () => "dark" as ThemeMode);
+    const showRatings = useSyncExternalStore(subscribe, getShowRatingsSnapshot, () => true);
+    const ogMode = useSyncExternalStore(subscribe, getOgSnapshot, () => false);
 
     useEffect(() => {
-        const nextTheme = readTheme();
-        setThemeState(nextTheme);
-        setShowRatingsState(readBool(SHOW_RATINGS_STORAGE_KEY, true));
-        setOgModeState(readBool(OG_STORAGE_KEY, false));
-        applyTheme(nextTheme);
-    }, []);
+        applyTheme(theme);
+    }, [theme]);
 
     const setTheme = useCallback((next: ThemeMode) => {
-        setThemeState(next);
-        applyTheme(next);
         try {
             window.localStorage.setItem(THEME_STORAGE_KEY, next);
         } catch {
             // Ignore storage failures.
         }
+        applyTheme(next);
+        emitChange();
     }, []);
 
     const toggleTheme = useCallback(() => {
@@ -90,13 +95,21 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     }, [setTheme, theme]);
 
     const setShowRatings = useCallback((value: boolean) => {
-        setShowRatingsState(value);
-        writeBool(SHOW_RATINGS_STORAGE_KEY, value);
+        try {
+            window.localStorage.setItem(SHOW_RATINGS_STORAGE_KEY, String(value));
+        } catch {
+            // Ignore storage failures.
+        }
+        emitChange();
     }, []);
 
     const setOgMode = useCallback((value: boolean) => {
-        setOgModeState(value);
-        writeBool(OG_STORAGE_KEY, value);
+        try {
+            window.localStorage.setItem(OG_STORAGE_KEY, String(value));
+        } catch {
+            // Ignore storage failures.
+        }
+        emitChange();
     }, []);
 
     const value = useMemo(

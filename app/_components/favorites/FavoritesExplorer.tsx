@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { fetchDashboard } from "@/app/_lib/api";
@@ -278,14 +278,16 @@ export default function FavoritesExplorer() {
     const showDirectors = filter === "all" || filter === "directors";
     const showAllGroups = filter === "all";
 
-    // Reset pagination when the filtered list changes.
-    useEffect(() => {
-        setActorPage(1);
-    }, [favoriteActors.length, filter]);
+    const actorTotalPages = getTotalPages(favoriteActors.length, FAVORITES_PAGE_SIZE);
+    const directorTotalPages = getTotalPages(favoriteDirectors.length, FAVORITES_PAGE_SIZE);
+    const safeActorPage = Math.min(actorPage, actorTotalPages);
+    const safeDirectorPage = Math.min(directorPage, directorTotalPages);
 
-    useEffect(() => {
+    const handleFilterChange = (next: FavoritesFilter) => {
+        setFilter(next);
+        setActorPage(1);
         setDirectorPage(1);
-    }, [favoriteDirectors.length, filter]);
+    };
 
     return (
         <>
@@ -356,7 +358,7 @@ export default function FavoritesExplorer() {
                                                     <h2 className="mt-1 text-2xl font-semibold text-accent roboto-flex">Your collection</h2>
                                                     <p className="mt-1 max-w-xl text-sm text-secondary">Browse everything you have saved — movies first, people just below.</p>
                                                 </div>
-                                                <CollectionFilterBar filter={filter} onFilterChange={setFilter} counts={tabCounts} />
+                                                <CollectionFilterBar filter={filter} onFilterChange={handleFilterChange} counts={tabCounts} />
                                             </div>
                                             <div className="h-px w-full bg-gradient-to-r from-accent/40 via-white/10 to-transparent" aria-hidden />
                                         </div>
@@ -375,7 +377,7 @@ export default function FavoritesExplorer() {
                                             {showActors && (favoriteActors.length > 0 || filter === "actors") && (
                                                 <div className="flex flex-col gap-4">
                                                     {favoriteActors.length > 0 && <RowTitle featured={filter === "actors"}>Actors</RowTitle>}
-                                                    {favoriteActors.length > 0 ? <PaginatedPeople people={favoriteActors} page={actorPage} onPageChange={setActorPage} onSelect={setSelectedPerson} /> : <EmptyFilterState message="No favorite actors yet." href="/people" linkLabel="Browse people" />}
+                                                    {favoriteActors.length > 0 ? <PaginatedPeople people={favoriteActors} page={safeActorPage} onPageChange={setActorPage} onSelect={setSelectedPerson} /> : <EmptyFilterState message="No favorite actors yet." href="/people" linkLabel="Browse people" />}
                                                 </div>
                                             )}
 
@@ -383,7 +385,7 @@ export default function FavoritesExplorer() {
                                                 <div className="flex flex-col gap-4">
                                                     {favoriteDirectors.length > 0 && <RowTitle featured={filter === "directors"}>Directors</RowTitle>}
                                                     {favoriteDirectors.length > 0 ? (
-                                                        <PaginatedPeople people={favoriteDirectors} page={directorPage} onPageChange={setDirectorPage} onSelect={setSelectedPerson} />
+                                                        <PaginatedPeople people={favoriteDirectors} page={safeDirectorPage} onPageChange={setDirectorPage} onSelect={setSelectedPerson} />
                                                     ) : (
                                                         <EmptyFilterState message="No favorite directors yet." href="/people" linkLabel="Browse people" />
                                                     )}

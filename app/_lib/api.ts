@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { CreateFavoriteRequest, DashboardData, Favorite, MovieBrowseResponse, MovieDetail, MovieSummary, PeoplePage, PersonDetail, RecommendationsResponse, SearchResponse, User } from "./types";
+import type { CreateFavoriteRequest, DashboardData, Favorite, MovieBrowseResponse, MovieDetail, PeoplePage, PersonDetail, RecommendationsResponse, SearchResponse, User } from "./types";
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
 

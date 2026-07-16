@@ -124,14 +124,6 @@ export default function PeopleExplorer() {
         return () => clearTimeout(timeout);
     }, [query]);
 
-    useEffect(() => {
-        setActorFavoritesPage(1);
-    }, [favoriteActors.length]);
-
-    useEffect(() => {
-        setDirectorFavoritesPage(1);
-    }, [favoriteDirectors.length]);
-
     // Deep-link: /people?personId=… opens the side panel for that person.
     useEffect(() => {
         const rawPersonId = searchParams.get("personId");
@@ -247,8 +239,8 @@ export default function PeopleExplorer() {
                         {hasFavorites && (
                             <SectionCard>
                                 <div className="flex flex-col gap-8">
-                                    <FavoritesSection title="Favorite actors" people={favoriteActors} page={actorFavoritesPage} onPageChange={setActorFavoritesPage} onSelect={setSelectedPerson} />
-                                    <FavoritesSection title="Favorite directors" people={favoriteDirectors} page={directorFavoritesPage} onPageChange={setDirectorFavoritesPage} onSelect={setSelectedPerson} />
+                                    <FavoritesSection title="Favorite actors" people={favoriteActors} page={Math.min(actorFavoritesPage, getTotalPages(favoriteActors.length, FAVORITES_PAGE_SIZE))} onPageChange={setActorFavoritesPage} onSelect={setSelectedPerson} />
+                                    <FavoritesSection title="Favorite directors" people={favoriteDirectors} page={Math.min(directorFavoritesPage, getTotalPages(favoriteDirectors.length, FAVORITES_PAGE_SIZE))} onPageChange={setDirectorFavoritesPage} onSelect={setSelectedPerson} />
                                 </div>
                             </SectionCard>
                         )}

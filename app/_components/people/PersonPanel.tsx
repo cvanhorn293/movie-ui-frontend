@@ -59,19 +59,17 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 }
 
 export default function PersonPanel({ person, onClose }: PersonPanelProps) {
-    // Keep showing the last person while the close animation runs.
-    const [displayed, setDisplayed] = useState<PersonSummary | null>(null);
+    // Keep the last opened person so the panel can finish its close animation.
+    const [displayed, setDisplayed] = useState<PersonSummary | null>(person);
     const [bioExpanded, setBioExpanded] = useState(false);
     const { isPersonFavorited, togglePersonFavorite, isAuthenticated } = useFavorites();
 
     const open = person != null;
 
-    useEffect(() => {
-        if (person) {
-            setDisplayed(person);
-            setBioExpanded(false);
-        }
-    }, [person]);
+    if (person != null && (displayed == null || person.tmdbId !== displayed.tmdbId)) {
+        setDisplayed(person);
+        setBioExpanded(false);
+    }
 
     // Escape closes the panel; lock body scroll while open.
     useEffect(() => {

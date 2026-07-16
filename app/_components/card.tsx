@@ -15,7 +15,7 @@ interface DataHeader {
     headerText: string;
     headerWidth: number;
     dataKey?: string;
-    renderCell?: (row: any) => React.ReactNode; // Custom render function for the cell
+    renderCell?: (row: Record<string, unknown>) => React.ReactNode;
 }
 
 /* CARD COMPONENT PROPS
@@ -32,13 +32,13 @@ interface DataHeader {
  */
 
 interface CardProps {
-    colSpan: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12; // Grid column span (1-12)
+    colSpan: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
     title: string;
     icon?: string | React.ComponentType<React.SVGProps<SVGSVGElement>>;
     button?: boolean;
     buttonText?: string;
     dataHeader?: DataHeader[];
-    data?: any[];
+    data?: Record<string, unknown>[];
     isLoading?: boolean;
     error?: string | null;
     pagination?: boolean;
@@ -130,7 +130,7 @@ export default function Card({ colSpan = 12, title, icon, button, buttonText, da
                                     const value = header.dataKey ? row[header.dataKey] : row[header.headerText.toLowerCase().replace(/\s+/g, "_")];
                                     return (
                                         <p key={colIndex} className="text-sm text-dark" style={{ width: `${header.headerWidth}%` }}>
-                                            {value}
+                                            {String(value ?? "")}
                                         </p>
                                     );
                                 })}
