@@ -24,16 +24,8 @@ interface MoviesBrowseHeroProps {
 
 function CategoryButton({ genreName, coverUrl, onClick }: { genreName: string; coverUrl: string | null; onClick: () => void }) {
     return (
-        <button
-            type="button"
-            onClick={onClick}
-            className="group relative h-full min-h-0 overflow-hidden rounded-lg bg-white/5 text-left transition-transform hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
-        >
-            {coverUrl ? (
-                <img src={coverUrl} alt="" className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
-            ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-teal-500/10" />
-            )}
+        <button type="button" onClick={onClick} className="group relative h-full min-h-0 overflow-hidden rounded-lg bg-white/5 text-left transition-transform hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60">
+            {coverUrl ? <img src={coverUrl} alt="" className="absolute inset-0 h-full w-full object-cover" loading="lazy" /> : <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-teal-500/10" />}
             <div className="absolute inset-0 bg-[#04121D]/65 transition-colors group-hover:bg-[#04121D]/55" />
             <span className="absolute inset-0 flex items-center justify-center px-2 text-center text-[11px] font-semibold leading-tight text-white sm:text-xs">{genreName}</span>
         </button>
@@ -109,10 +101,7 @@ export default function MoviesBrowseHero({ featuredMovie, genreRows, isLoading }
                         {featuredMovie.overview && <p className="hero-safe-muted mt-2 line-clamp-3 text-sm leading-relaxed">{featuredMovie.overview}</p>}
 
                         <div className="mt-4">
-                            <Link
-                                href={`/movies/${featuredMovie.tmdbId}`}
-                                className="inline-flex items-center gap-2 rounded-xl bg-primary-gradient px-5 py-2.5 text-sm font-semibold text-[#04121D] transition-opacity hover:opacity-90"
-                            >
+                            <Link href={`/movies/${featuredMovie.tmdbId}`} className="inline-flex items-center gap-2 rounded-xl bg-primary-gradient px-5 py-2.5 text-sm font-semibold text-[#04121D] transition-opacity hover:opacity-90">
                                 View Movie
                                 <ChevRight className="h-4 w-4" />
                             </Link>
@@ -125,18 +114,13 @@ export default function MoviesBrowseHero({ featuredMovie, genreRows, isLoading }
                 </div>
             )}
 
-            {/* Genre jump grid — scrolls to the matching row below */}
+            {/* Genre jump grid - scrolls to the matching row below */}
             {categories.length > 0 && (
                 <div className={`flex ${FEATURED_MIN_HEIGHT} flex-col gap-2`}>
                     <h3 className="shrink-0 text-xs font-semibold uppercase tracking-wide text-tertiary">Browse by genre</h3>
                     <div className="grid min-h-0 flex-1 grid-cols-2 grid-rows-5 gap-2">
                         {categories.map((row) => (
-                            <CategoryButton
-                                key={row.genreName}
-                                genreName={row.genreName}
-                                coverUrl={getPosterUrl(row.movies[0])}
-                                onClick={() => scrollToGenre(row.genreName)}
-                            />
+                            <CategoryButton key={row.genreName} genreName={row.genreName} coverUrl={getPosterUrl(row.movies[0])} onClick={() => scrollToGenre(row.genreName)} />
                         ))}
                     </div>
                 </div>

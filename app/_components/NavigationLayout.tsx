@@ -78,12 +78,7 @@ export default function NavigationLayout({ children }: { children: React.ReactNo
 
                 {/* Settings + collapse control */}
                 <div className="py-2 px-4">
-                    <Link
-                        href="/settings"
-                        className={`flex items-center py-3 transition-colors rounded-lg roboto-flex ${sidebarCollapsed ? "justify-center" : "px-4 py-4"} ${
-                            pathname === "/settings" && !sidebarCollapsed ? "bg-hover" : "hover:bg-hover/35"
-                        }`}
-                    >
+                    <Link href="/settings" className={`flex items-center py-3 transition-colors rounded-lg roboto-flex ${sidebarCollapsed ? "justify-center" : "px-4 py-4"} ${pathname === "/settings" && !sidebarCollapsed ? "bg-hover" : "hover:bg-hover/35"}`}>
                         <SettingsIcon className={`h-6 w-6 mb-1 ${pathname === "/settings" && sidebarCollapsed ? "text-accent" : "lightest-gray"}`} />
                         {!sidebarCollapsed && <span className="ml-4 whitespace-nowrap font-medium">Settings</span>}
                     </Link>
@@ -102,21 +97,13 @@ export default function NavigationLayout({ children }: { children: React.ReactNo
             </aside>
 
             {/* Fixed top bar: global search + profile */}
-            <header
-                className={`fixed top-0 right-0 left-0 z-30 flex items-center justify-between gap-4 px-4 py-4 transition-all duration-300 sm:px-6 ${sidebarCollapsed ? "md:left-16" : "md:left-64"} ${
-                    scrolled ? "header-frosted border-b" : "border-b border-transparent bg-transparent"
-                }`}
-            >
+            <header className={`fixed top-0 right-0 left-0 z-30 flex items-center justify-between gap-4 px-4 py-4 transition-all duration-300 sm:px-6 ${sidebarCollapsed ? "md:left-16" : "md:left-64"} ${scrolled ? "header-frosted border-b" : "border-b border-transparent bg-transparent"}`}>
                 <Search variant={isHome ? "hero" : "default"} />
                 <Profile />
             </header>
 
-            {/* Scrollable page content — this element must own scroll for the frosted header */}
-            <div
-                ref={mainRef}
-                data-main-scroll
-                className={`min-h-0 flex-1 overflow-y-auto pb-20 md:pb-0 transition-all duration-300 ${sidebarCollapsed ? "md:ml-16" : "md:ml-64"}`}
-            >
+            {/* Scrollable page content - this element must own scroll for the frosted header */}
+            <div ref={mainRef} data-main-scroll className={`min-h-0 flex-1 overflow-y-auto pb-20 md:pb-0 transition-all duration-300 ${sidebarCollapsed ? "md:ml-16" : "md:ml-64"}`}>
                 {isFullBleed ? children : <div className="container mx-auto px-4 pt-24 pb-4 sm:px-6 sm:py-8 sm:pt-24">{children}</div>}
             </div>
 

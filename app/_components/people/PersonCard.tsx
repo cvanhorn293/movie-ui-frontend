@@ -25,7 +25,7 @@ export default function PersonCard({ person, onSelect, showRoleBadge = false }: 
     const favorited = isPersonFavorited(person.tmdbId);
     const role = getPersonRole(person.knownForDepartment);
 
-    // Fetch detail on hover — populates the hover facts and warms the cache the panel reuses.
+    // Fetch detail on hover - populates the hover facts and warms the cache the panel reuses.
     const { data: detail } = useQuery({
         queryKey: ["person", person.tmdbId],
         queryFn: () => fetchPerson(person.tmdbId),

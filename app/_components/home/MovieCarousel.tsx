@@ -82,7 +82,7 @@ export default function MovieCarousel({ title, movies, isLoading, linkToDetail =
                                 <h3 className="mt-2 line-clamp-2 text-sm font-semibold text-primary">{movie.title}</h3>
 
                                 <p className="text-xs text-secondary">
-                                    {movie.releaseDate?.slice(0, 4) ?? "—"}
+                                    {movie.releaseDate?.slice(0, 4) ?? "-"}
                                     {showRatings && movie.rating != null ? ` · ★ ${movie.rating.toFixed(1)}` : ""}
                                 </p>
                             </article>

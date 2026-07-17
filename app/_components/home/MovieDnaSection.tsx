@@ -47,29 +47,17 @@ export default function MovieDnaSection({ data, isLoading, plain = false, stats,
         <div className="h-64 animate-pulse rounded-lg bg-white/5" />
     ) : (
         <div className="grid gap-6 lg:grid-cols-2">
-            {/* Genre donut — click a slice to update the spotlight */}
+            {/* Genre donut - click a slice to update the spotlight */}
             <div className={plain ? "py-2" : "p-5"}>
                 <GenreDonutChart genreStats={genreStats} selectedGenre={activeGenre} onSelectGenre={setSelectedGenre} />
             </div>
 
             <div className="flex flex-col gap-5">
                 {/* Selected genre story + top titles */}
-                <GenreExplorer
-                    selectedGenre={activeGenre}
-                    topMovies={topMovies}
-                    percentage={activeStat?.percentage ?? null}
-                    rank={activeIndex >= 0 ? activeIndex + 1 : null}
-                    titleCount={genreMovies.length}
-                    avgRating={genreAvgRating}
-                    className="flex-1"
-                />
+                <GenreExplorer selectedGenre={activeGenre} topMovies={topMovies} percentage={activeStat?.percentage ?? null} rank={activeIndex >= 0 ? activeIndex + 1 : null} titleCount={genreMovies.length} avgRating={genreAvgRating} className="flex-1" />
                 {/* Collection summary stats */}
                 <div className={plain ? "px-1 py-2" : "rounded-xl border border-white/5 bg-white/[0.02] px-5 py-4"}>
-                    {stats ? (
-                        <DnaStats stats={stats} />
-                    ) : (
-                        <DnaStats moviesSaved={data?.movieCount ?? 0} peopleSaved={data?.personCount ?? 0} avgRating={avgRating} topRating={topRating} latestYear={latestYear} />
-                    )}
+                    {stats ? <DnaStats stats={stats} /> : <DnaStats moviesSaved={data?.movieCount ?? 0} peopleSaved={data?.personCount ?? 0} avgRating={avgRating} topRating={topRating} latestYear={latestYear} />}
                 </div>
             </div>
         </div>

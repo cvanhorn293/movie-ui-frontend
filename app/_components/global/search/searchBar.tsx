@@ -35,7 +35,7 @@ function SearchBarInner({ variant = "default" }: SearchBarProps) {
         setDebouncedQuery(urlQuery);
     }
 
-    // Debounce preview requests.
+    // Debounce preview requests (Delay function execution for a certain amount of time)
     useEffect(() => {
         const timeout = setTimeout(() => setDebouncedQuery(searchQuery.trim()), DEBOUNCE_MS);
         return () => clearTimeout(timeout);
@@ -106,7 +106,7 @@ function SearchBarInner({ variant = "default" }: SearchBarProps) {
 
     return (
         <div ref={containerRef} className={`relative w-full ${isHero ? "max-w-2xl" : "max-w-xl"}`}>
-            {/* Search input — same chrome as the rest of the top bar in both themes */}
+            {/* Search input - same chrome as the rest of the top bar in both themes */}
             <div className="flex items-center rounded-lg border border-white/10 bg-card shadow-inner focus-within:border-white/20 focus-within:ring-1 focus-within:ring-white/10">
                 <button type="button" onClick={handleSearch} className="mr-1 cursor-pointer rounded-lg px-4 py-3 transition-colors" aria-label="Search">
                     <SearchIcon className="h-4 w-4 text-secondary" />
@@ -133,11 +133,7 @@ function SearchBarInner({ variant = "default" }: SearchBarProps) {
 
             {/* Live preview dropdown */}
             {showDropdown && (
-                <div
-                    id="global-search-results"
-                    role="listbox"
-                    className="absolute top-full z-50 mt-2 w-full overflow-hidden rounded-xl border border-white/10 bg-card shadow-2xl"
-                >
+                <div id="global-search-results" role="listbox" className="absolute top-full z-50 mt-2 w-full overflow-hidden rounded-xl border border-white/10 bg-card shadow-2xl">
                     {search.isLoading ? (
                         <p className="px-4 py-3 text-sm text-secondary">Searching…</p>
                     ) : search.isError ? (
@@ -154,22 +150,13 @@ function SearchBarInner({ variant = "default" }: SearchBarProps) {
                                             const posterUrl = getPosterUrl(movie);
                                             return (
                                                 <li key={movie.tmdbId}>
-                                                    <Link
-                                                        href={`/movies/${movie.tmdbId}`}
-                                                        onClick={() => setIsOpen(false)}
-                                                        className="flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-white/[0.05]"
-                                                        role="option"
-                                                    >
+                                                    <Link href={`/movies/${movie.tmdbId}`} onClick={() => setIsOpen(false)} className="flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-white/[0.05]" role="option">
                                                         <div className="h-12 w-8 shrink-0 overflow-hidden rounded bg-white/5">
-                                                            {posterUrl ? (
-                                                                <img src={posterUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
-                                                            ) : (
-                                                                <div className="flex h-full items-center justify-center text-[9px] text-tertiary">N/A</div>
-                                                            )}
+                                                            {posterUrl ? <img src={posterUrl} alt="" className="h-full w-full object-cover" loading="lazy" /> : <div className="flex h-full items-center justify-center text-[9px] text-tertiary">N/A</div>}
                                                         </div>
                                                         <div className="min-w-0">
                                                             <p className="truncate text-sm font-medium text-primary">{movie.title}</p>
-                                                            <p className="text-xs text-secondary">{movie.releaseDate?.slice(0, 4) ?? "—"}</p>
+                                                            <p className="text-xs text-secondary">{movie.releaseDate?.slice(0, 4) ?? "-"}</p>
                                                         </div>
                                                     </Link>
                                                 </li>
@@ -187,12 +174,7 @@ function SearchBarInner({ variant = "default" }: SearchBarProps) {
                                             const role = getPersonRole(person.knownForDepartment);
                                             return (
                                                 <li key={person.tmdbId}>
-                                                    <Link
-                                                        href={`/people?personId=${person.tmdbId}`}
-                                                        onClick={() => setIsOpen(false)}
-                                                        className="flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-white/[0.05]"
-                                                        role="option"
-                                                    >
+                                                    <Link href={`/people?personId=${person.tmdbId}`} onClick={() => setIsOpen(false)} className="flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-white/[0.05]" role="option">
                                                         <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-white/5">
                                                             {person.profileUrl ? (
                                                                 <img src={person.profileUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
@@ -202,7 +184,7 @@ function SearchBarInner({ variant = "default" }: SearchBarProps) {
                                                         </div>
                                                         <div className="min-w-0">
                                                             <p className="truncate text-sm font-medium text-primary">{person.name}</p>
-                                                            <p className="text-xs text-secondary">{role ? getPersonRoleLabel(role) : person.knownForDepartment ?? "Person"}</p>
+                                                            <p className="text-xs text-secondary">{role ? getPersonRoleLabel(role) : (person.knownForDepartment ?? "Person")}</p>
                                                         </div>
                                                     </Link>
                                                 </li>
@@ -216,11 +198,7 @@ function SearchBarInner({ variant = "default" }: SearchBarProps) {
 
                     {/* Jump to the full search results page */}
                     <div className="border-t border-white/10 px-2 py-2">
-                        <button
-                            type="button"
-                            onClick={handleSearch}
-                            className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-accent transition-colors hover:bg-white/[0.05]"
-                        >
+                        <button type="button" onClick={handleSearch} className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-accent transition-colors hover:bg-white/[0.05]">
                             See all results for &ldquo;{debouncedQuery}&rdquo;
                         </button>
                     </div>

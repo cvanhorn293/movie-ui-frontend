@@ -35,9 +35,7 @@ function InsightItem({ label, value }: InsightItemProps) {
 }
 
 export default function CollectionInsights({ insights, isLoading }: CollectionInsightsProps) {
-    const recentFavoriteLabel = insights.recentFavorite
-        ? `${insights.recentFavorite.title} (${getFavoriteTypeLabel(insights.recentFavorite.entityType)})`
-        : "—";
+    const recentFavoriteLabel = insights.recentFavorite ? `${insights.recentFavorite.title} (${getFavoriteTypeLabel(insights.recentFavorite.entityType)})` : "-";
 
     return (
         <SectionCard title="Collection Insights">
@@ -49,13 +47,10 @@ export default function CollectionInsights({ insights, isLoading }: CollectionIn
                 </div>
             ) : (
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-                    <InsightItem label="Favorite Genre" value={insights.favoriteGenre ?? "—"} />
-                    <InsightItem label="Favorite Director" value={insights.favoriteDirector ?? "—"} />
-                    <InsightItem label="Favorite Decade" value={insights.favoriteDecade ?? "—"} />
-                    <InsightItem
-                        label="Collection Age"
-                        value={insights.collectionAgeDays != null ? `${insights.collectionAgeDays} days` : "—"}
-                    />
+                    <InsightItem label="Favorite Genre" value={insights.favoriteGenre ?? "-"} />
+                    <InsightItem label="Favorite Director" value={insights.favoriteDirector ?? "-"} />
+                    <InsightItem label="Favorite Decade" value={insights.favoriteDecade ?? "-"} />
+                    <InsightItem label="Collection Age" value={insights.collectionAgeDays != null ? `${insights.collectionAgeDays} days` : "-"} />
                     <InsightItem label="Recent Favorite" value={recentFavoriteLabel} />
                 </div>
             )}

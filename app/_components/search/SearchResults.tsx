@@ -41,7 +41,7 @@ export default function SearchResults() {
     const movies = search.data?.movies ?? [];
     const hasResults = movies.length > 0 || people.length > 0;
 
-    // Empty query — prompt to use the top search bar.
+    // Empty query - prompt to use the top search bar.
     if (!query) {
         return (
             <div className="flex flex-col gap-2">
@@ -56,9 +56,7 @@ export default function SearchResults() {
             <div className="flex flex-col gap-8">
                 <header className="flex flex-col gap-1">
                     <h1 className="text-2xl font-semibold text-primary sm:text-3xl">Search results</h1>
-                    <p className="text-sm text-secondary">
-                        Showing results for &ldquo;{query}&rdquo;
-                    </p>
+                    <p className="text-sm text-secondary">Showing results for &ldquo;{query}&rdquo;</p>
                 </header>
 
                 {search.isLoading ? (

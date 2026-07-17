@@ -256,7 +256,7 @@ export default function FavoritesExplorer() {
             { label: "Total saved", value: totalCount.toLocaleString(), accent: true },
             { label: "Movies", value: movieCount.toLocaleString() },
             { label: "People", value: personCount.toLocaleString() },
-            { label: "Collection age", value: collectionAge != null ? `${collectionAge}d` : "—" },
+            { label: "Collection age", value: collectionAge != null ? `${collectionAge}d` : "-" },
         ],
         [totalCount, movieCount, personCount, collectionAge],
     );
@@ -295,7 +295,7 @@ export default function FavoritesExplorer() {
                 {/* Page header */}
                 <header className="flex flex-col gap-1">
                     <h1 className="text-2xl font-semibold text-primary sm:text-3xl">Favorites</h1>
-                    <p className="max-w-2xl text-sm text-secondary">Your saved movies, actors, and directors — revisit what you love and keep building your collection.</p>
+                    <p className="max-w-2xl text-sm text-secondary">Your saved movies, actors, and directors - revisit what you love and keep building your collection.</p>
                 </header>
 
                 {/* Signed-out prompt */}
@@ -356,7 +356,7 @@ export default function FavoritesExplorer() {
                                             <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                                                 <div>
                                                     <h2 className="mt-1 text-2xl font-semibold text-accent roboto-flex">Your collection</h2>
-                                                    <p className="mt-1 max-w-xl text-sm text-secondary">Browse everything you have saved — movies first, people just below.</p>
+                                                    <p className="mt-1 max-w-xl text-sm text-secondary">Browse everything you have saved - movies first, people just below.</p>
                                                 </div>
                                                 <CollectionFilterBar filter={filter} onFilterChange={handleFilterChange} counts={tabCounts} />
                                             </div>
@@ -377,7 +377,11 @@ export default function FavoritesExplorer() {
                                             {showActors && (favoriteActors.length > 0 || filter === "actors") && (
                                                 <div className="flex flex-col gap-4">
                                                     {favoriteActors.length > 0 && <RowTitle featured={filter === "actors"}>Actors</RowTitle>}
-                                                    {favoriteActors.length > 0 ? <PaginatedPeople people={favoriteActors} page={safeActorPage} onPageChange={setActorPage} onSelect={setSelectedPerson} /> : <EmptyFilterState message="No favorite actors yet." href="/people" linkLabel="Browse people" />}
+                                                    {favoriteActors.length > 0 ? (
+                                                        <PaginatedPeople people={favoriteActors} page={safeActorPage} onPageChange={setActorPage} onSelect={setSelectedPerson} />
+                                                    ) : (
+                                                        <EmptyFilterState message="No favorite actors yet." href="/people" linkLabel="Browse people" />
+                                                    )}
                                                 </div>
                                             )}
 
